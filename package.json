@@ -1,0 +1,11 @@
+{
+  "name": "easier-streams",
+  "version": "1.0.0",
+  "description": "make it easier to work with streams",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
