@@ -1,6 +1,6 @@
 {
   "name": "easier-streams",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "make it easier to work with streams",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "easier-streams": "file:dist/easier-streams-1.0.0.tgz",
     "lodash.clonedeep": "^4.5.0"
   },
   "devDependencies": {
