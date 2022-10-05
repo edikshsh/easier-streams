@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArraySplitTransform = void 0;
-const stream_1 = require("stream");
-class ArraySplitTransform extends stream_1.Transform {
+const base_transform_1 = require("../base-transform");
+class ArraySplitTransform extends base_transform_1.BaseTransform {
     constructor(options) {
         super(options);
     }

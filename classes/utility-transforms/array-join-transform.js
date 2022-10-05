@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArrayJoinTransform = void 0;
-const stream_1 = require("stream");
-class ArrayJoinTransform extends stream_1.Transform {
+const base_transform_1 = require("../base-transform");
+class ArrayJoinTransform extends base_transform_1.BaseTransform {
     constructor(length, options) {
         super(options);
         this.length = length;
