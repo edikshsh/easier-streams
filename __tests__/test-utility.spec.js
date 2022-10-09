@@ -22,11 +22,12 @@ describe('Test Utility transforms', () => {
                 item.a += 10;
                 modified.push(item);
             };
-            const sideEffectsTransform = utility_transforms_1.objectUtilityTransforms.callOnData(increaseBy10);
+            const sideEffectsTransform = utility_transforms_1.objectUtilityTransforms.callOnDataSync(increaseBy10);
             const b = a.pipe(sideEffectsTransform);
             const result = [];
             const modified = [];
             b.on('data', (data) => result.push(data));
+            // b.on('data')
             yield (0, helpers_for_tests_1.streamEnd)(b);
             expect(result).toEqual(arr);
             expect(modified).toEqual(expectedModifiedArr);
@@ -40,7 +41,7 @@ describe('Test Utility transforms', () => {
                 item.a += 10;
                 modified.push(item);
             });
-            const sideEffectsTransform = utility_transforms_1.objectUtilityTransforms.callOnData(increaseBy10, { functionOptions: { shouldBeAwaited: true } });
+            const sideEffectsTransform = utility_transforms_1.objectUtilityTransforms.callOnDataAsync(increaseBy10);
             const b = a.pipe(sideEffectsTransform);
             const result = [];
             const modified = [];

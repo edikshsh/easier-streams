@@ -31,11 +31,9 @@ describe('TypedEventEmitter', () => {
         const promise = ee.promisifyEvents(['data'], ['error']);
         //Adding a dummy error handler because node passes all "error" events to process unless there is a listener.
         ee.on('error', () => undefined);
-        debugger;
         setTimeout(() => ee.emit('data', 12), 10);
         setTimeout(() => ee.emit('error', Error('asdf12123')), 20);
         yield expect(promise).resolves.toBe(12);
-        debugger;
     }));
 });
 // async function testTypedEventEmitterPromisify(){

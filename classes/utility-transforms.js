@@ -35,26 +35,43 @@ class UtilityTransforms {
     }
     // When we pass an async function, we sometimes want to wait for it to finish, and sometimes to push to an array and wait with promise.all
     // Sometimes we can pass a regular function that returns a promise, so we dont know 100% when to wait
-    callOnData(functionToCallOnData, options) {
-        var _a;
-        const finalOptions = this.mergeOptions(options === null || options === void 0 ? void 0 : options.transformOptions);
-        const shouldBeAwaited = (_a = options === null || options === void 0 ? void 0 : options.functionOptions) === null || _a === void 0 ? void 0 : _a.shouldBeAwaited;
-        if (shouldBeAwaited) {
-            const callOnData = (data) => __awaiter(this, void 0, void 0, function* () {
-                const dataCopy = (0, lodash_clonedeep_1.default)(data);
-                yield functionToCallOnData(dataCopy);
-                return data;
-            });
-            return new simple_async_transform_1.SimpleAsyncTransform(callOnData, finalOptions);
-        }
-        else {
-            const callOnData = (data) => {
-                const dataCopy = (0, lodash_clonedeep_1.default)(data);
-                functionToCallOnData(dataCopy);
-                return data;
-            };
-            return new simple_transform_1.SimpleTransform(callOnData, finalOptions);
-        }
+    // callOnData<TSource>(functionToCallOnData: (data: TSource) => (void | Promise<void>),
+    //  options?: { transformOptions?: TransformOptions; functionOptions?: PassedFunctionOptions }) {
+    //     const finalOptions = this.mergeOptions(options?.transformOptions);
+    //     const shouldBeAwaited = options?.functionOptions?.shouldBeAwaited;
+    //     if (shouldBeAwaited){
+    //         const callOnData = async (data: TSource) => {
+    //             const dataCopy = cloneDeep(data);
+    //             await functionToCallOnData(dataCopy);
+    //             return data;
+    //         }
+    //         return new SimpleAsyncTransform(callOnData,finalOptions);
+    //     } else {
+    //         const callOnData = (data: TSource) => {
+    //             const dataCopy = cloneDeep(data);
+    //             functionToCallOnData(dataCopy);
+    //             return data;
+    //         }
+    //         return new SimpleTransform(callOnData,finalOptions);
+    //     }
+    // }
+    callOnDataSync(functionToCallOnData, options) {
+        const finalOptions = this.mergeOptions(options);
+        const callOnData = (data) => {
+            const dataCopy = (0, lodash_clonedeep_1.default)(data);
+            functionToCallOnData(dataCopy);
+            return data;
+        };
+        return new simple_transform_1.SimpleTransform(callOnData, finalOptions);
+    }
+    callOnDataAsync(functionToCallOnData, options) {
+        const finalOptions = this.mergeOptions(options);
+        const callOnData = (data) => __awaiter(this, void 0, void 0, function* () {
+            const dataCopy = (0, lodash_clonedeep_1.default)(data);
+            yield functionToCallOnData(dataCopy);
+            return data;
+        });
+        return new simple_async_transform_1.SimpleAsyncTransform(callOnData, finalOptions);
     }
     void(options) {
         const finalOptions = this.mergeOptions(options);
@@ -72,11 +89,11 @@ class UtilityTransforms {
         };
         return new simple_transform_1.SimpleTransform(filter, finalOptions);
     }
-    fromFunction(...[transformer, options]) {
+    fromFunction(transformer, options) {
         const finalOptions = this.mergeOptions(options);
         return new simple_transform_1.SimpleTransform(transformer, finalOptions);
     }
-    fromAsyncFunction(...[transformer, options]) {
+    fromAsyncFunction(transformer, options) {
         const finalOptions = this.mergeOptions(options);
         return new simple_async_transform_1.SimpleAsyncTransform(transformer, finalOptions);
     }

@@ -24,6 +24,7 @@ describe('Test transforms', () => {
             b.on('data', (data) => result.push(data));
             yield (0, helpers_for_tests_1.streamEnd)(b);
             expect(result).toEqual([[1, 2, 3], [4, 5, 6]]);
+            const asdasd = new Promise(res => res);
         }));
         it('should flush remaining data even if array is not full', () => __awaiter(void 0, void 0, void 0, function* () {
             const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7]);
