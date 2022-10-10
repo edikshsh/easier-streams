@@ -46,6 +46,8 @@ A bunch of helpful transforms:
 - **fromFunction** - initialized with a function, then creates a transform using this function.
 - **fromAsyncFunction** - initialized with an async function or a function that returns a promise, then creates a transform using this function.
 - **passThrough** - just a typed passThrough transform, passes chunks as is.
+- **pickElementFromArray** - take an array and emit a single element by index
+- **fromFunctionConcurrent** - like fromAsyncFunction but runs the received function concurrently
 
 You can initialize a new utility transform - it takes TrasnformOptions and uses them as a default for every transform it creates.
 Or use **utilityTransforms**- utility transform without defaults
