@@ -30,8 +30,6 @@ class SimpleAsyncTransform extends base_transform_1.BaseTransform {
                     callback(new Error(`${error}`));
                 }
             }
-            finally {
-            }
         });
     }
 }

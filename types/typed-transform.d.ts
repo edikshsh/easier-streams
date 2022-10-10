@@ -1,5 +1,4 @@
 /// <reference types="node" />
-/// <reference types="node" />
 import { Transform } from "stream";
 import { PromisifyEventReturnType } from "../emitters/Emitter";
 import { IEvents } from "../emitters/types";

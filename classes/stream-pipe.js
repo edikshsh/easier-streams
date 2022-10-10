@@ -14,6 +14,7 @@ class StreamPipe extends Emitter_1.TypedEventEmitter {
     pipePipelineEventsToSelf() {
         this._destination.on('close', () => this.emit('close'));
         this._destination.on('end', () => this.emit('end'));
+        this._destination.on('finish', () => this.emit('finish'));
         this._destination.on('data', (data) => this.emit('data', data));
         this._source.on('error', (error) => this.emit('error', error));
         this._pipeline.forEach(transform => transform.on('error', (error) => this.emit('error', error)));

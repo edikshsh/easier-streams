@@ -18,22 +18,6 @@ class EventPromisifier {
             if (!(resolveEvents.length || rejectEvents.length)) {
                 return undefined;
             }
-            // return new Promise<unknown>((resolve, reject) => {
-            //     const wrapReject = (...args: unknown[]) => {
-            //         console.log('rejecting_gggddd');
-            //         resolveEvents.forEach(resolveEvent => emitter.off(resolveEvent, wrapResolve));
-            //         rejectEvents.forEach(rejectEvent => emitter.off(rejectEvent, wrapReject));
-            //         reject(...args);
-            //     }
-            //     const wrapResolve = (arg: unknown) => {
-            //         console.log('resolving_gggddd');                
-            //         resolveEvents.forEach(resolveEvent => emitter.off(resolveEvent, wrapResolve));
-            //         rejectEvents.forEach(rejectEvent => emitter.off(rejectEvent, wrapReject));
-            //         resolve(arg);
-            //     }
-            //     resolveEvents.forEach(resolveEvent => emitter.on(resolveEvent, wrapResolve));
-            //     rejectEvents.forEach(rejectEvent => emitter.on(rejectEvent, wrapReject));
-            // });
             return new Promise((resolve, reject) => {
                 const allEvents = [...resolveEvents, ...rejectEvents];
                 const functionsToTurnOff = [];

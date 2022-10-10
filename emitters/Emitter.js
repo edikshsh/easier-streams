@@ -4,7 +4,6 @@ exports.TypedEventEmitter = void 0;
 const stream_1 = require("stream");
 const eventPromisifier_1 = require("./eventPromisifier");
 class TypedEventEmitter extends stream_1.EventEmitter {
-    // promisifyEvents<Key extends keyof Events, Key2 extends keyof Events>(resolveEvents: Key[], rejectEvents?: Key2[]): Promise<TupleToUnion<Parameters<Events[Key]>>> {
     promisifyEvents(resolveEvents, rejectEvents) {
         const stringResolveEvents = resolveEvents.map(event => event.toString());
         const stringRejectEvents = rejectEvents === null || rejectEvents === void 0 ? void 0 : rejectEvents.map(event => event.toString());

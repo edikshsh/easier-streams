@@ -22,16 +22,15 @@ describe('Test transforms', () => {
             const b = a.pipe(new array_join_transform_1.ArrayJoinTransform(3, { objectMode: true }));
             const result = [];
             b.on('data', (data) => result.push(data));
-            yield (0, helpers_for_tests_1.streamEnd)(b);
+            yield helpers_for_tests_1.streamEnd(b);
             expect(result).toEqual([[1, 2, 3], [4, 5, 6]]);
-            const asdasd = new Promise(res => res);
         }));
         it('should flush remaining data even if array is not full', () => __awaiter(void 0, void 0, void 0, function* () {
             const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7]);
             const b = a.pipe(new array_join_transform_1.ArrayJoinTransform(3, { objectMode: true }));
             const result = [];
             b.on('data', (data) => result.push(data));
-            yield (0, helpers_for_tests_1.streamEnd)(b);
+            yield helpers_for_tests_1.streamEnd(b);
             expect(result).toEqual([[1, 2, 3], [4, 5, 6], [7]]);
         }));
     });
@@ -41,7 +40,7 @@ describe('Test transforms', () => {
             const b = a.pipe(new array_split_transform_1.ArraySplitTransform({ objectMode: true }));
             const result = [];
             b.on('data', (data) => result.push(data));
-            yield (0, helpers_for_tests_1.streamEnd)(b);
+            yield helpers_for_tests_1.streamEnd(b);
             expect(result).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
         }));
     });
@@ -53,7 +52,7 @@ describe('Test transforms', () => {
             a.pipe(add1Transform);
             const result = [];
             add1Transform.on('data', (data) => result.push(data));
-            yield (0, helpers_for_tests_1.streamEnd)(add1Transform);
+            yield helpers_for_tests_1.streamEnd(add1Transform);
             expect(result).toEqual([2, 3, 4, 5, 6, 7, 8, 9]);
         }));
         it('pipes created transforms correctly', () => __awaiter(void 0, void 0, void 0, function* () {
@@ -67,7 +66,7 @@ describe('Test transforms', () => {
             a.pipe(add1Transform).pipe(filterOutOddsTranform).pipe(numberToStringTrasnform);
             const result = [];
             numberToStringTrasnform.on('data', (data) => result.push(data));
-            yield (0, helpers_for_tests_1.streamEnd)(numberToStringTrasnform);
+            yield helpers_for_tests_1.streamEnd(numberToStringTrasnform);
             expect(result).toEqual(['3', '5', '7', '9']);
         }));
     });
@@ -79,7 +78,7 @@ describe('Test transforms', () => {
             a.pipe(add1Transform);
             const result = [];
             add1Transform.on('data', (data) => result.push(data));
-            yield (0, helpers_for_tests_1.streamEnd)(add1Transform);
+            yield helpers_for_tests_1.streamEnd(add1Transform);
             expect(result).toEqual([2, 3, 4, 5, 6, 7, 8, 9]);
         }));
         it('pipes created transforms correctly', () => __awaiter(void 0, void 0, void 0, function* () {
@@ -93,7 +92,7 @@ describe('Test transforms', () => {
             a.pipe(add1Transform).pipe(filterOutOddsTranform).pipe(numberToStringTrasnform);
             const result = [];
             numberToStringTrasnform.on('data', (data) => result.push(data));
-            yield (0, helpers_for_tests_1.streamEnd)(numberToStringTrasnform);
+            yield helpers_for_tests_1.streamEnd(numberToStringTrasnform);
             expect(result).toEqual(['3', '5', '7', '9']);
         }));
         it('handles non immediate async functions', () => __awaiter(void 0, void 0, void 0, function* () {
@@ -110,7 +109,7 @@ describe('Test transforms', () => {
             a.pipe(add1Transform).pipe(filterOutOddsTranform).pipe(numberToStringTrasnform);
             const result = [];
             numberToStringTrasnform.on('data', (data) => result.push(data));
-            yield (0, helpers_for_tests_1.streamEnd)(numberToStringTrasnform);
+            yield helpers_for_tests_1.streamEnd(numberToStringTrasnform);
             expect(result).toEqual(['3', '5', '7', '9']);
         }));
     });
@@ -128,7 +127,7 @@ describe('Test transforms', () => {
         a.pipe(add1Transform).pipe(filterOutOddsTranform).pipe(numberToStringTrasnform);
         const result = [];
         numberToStringTrasnform.on('data', (data) => result.push(data));
-        yield (0, helpers_for_tests_1.streamEnd)(numberToStringTrasnform);
+        yield helpers_for_tests_1.streamEnd(numberToStringTrasnform);
         expect(result).toEqual(['3', '5', '7', '9']);
     }));
 });

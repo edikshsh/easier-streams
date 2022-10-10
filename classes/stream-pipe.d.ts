@@ -5,6 +5,7 @@ import { TypedTransform } from "../types/typed-transform";
 declare type StreamPipeEvents<T> = {
     data: (chunk: T) => void;
     end: () => void;
+    finish: () => void;
     close: () => void;
     error: (error: Error) => void;
 };
