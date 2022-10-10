@@ -14,7 +14,7 @@ error: (error: Error) => void
 ```
 then have it enforced on the event emitter functions:
 ```
-const ee =  new  TypedEventEmitter<MyEventEmitterEvents<number>>();
+const ee =  new TypedEventEmitter<MyEventEmitterEvents<number>>();
 ee.on('end',(someVar)=>undefined) //❌
 ee.on('end',()=>undefined)// ✅
 ee.on('data',(someVar)=>undefined)// ✅
