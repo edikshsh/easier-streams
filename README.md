@@ -29,8 +29,8 @@ ee.emit('error', new  Error())// ✅
 ### Promisify events
 An easy way to create a promise from events, with type checking
 ```
-ee.promisifyEvents(['data', 'end']);// ✅
-ee.promisifyEvents(['maybeData', 'end']);// ❌
+ee.promisifyEvents(['data'], ['end']);// ✅
+ee.promisifyEvents(['maybeData'], ['end']);// ❌
 ```
 ## Streams
 All transforms from this package implement typed event emitter
