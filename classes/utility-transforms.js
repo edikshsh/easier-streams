@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.objectUtilityTransforms = exports.utilityTransforms = exports.UtilityTransforms = void 0;
 const lodash_clonedeep_1 = __importDefault(require("lodash.clonedeep"));
+const concurrent_stream_output_ender_1 = require("./concurrent-stream-output-ender");
 const simple_async_transform_1 = require("./simple-async-transform");
 const simple_transform_1 = require("./simple-transform");
 const TypedPassThrough_1 = require("./TypedPassThrough");
@@ -79,6 +80,27 @@ class UtilityTransforms {
     passThrough(options) {
         const finalOptions = this.mergeOptions(options);
         return new TypedPassThrough_1.TypedPassThrough(finalOptions);
+    }
+    pickElementFromArray(index, options) {
+        const finalOptions = this.mergeOptions(options);
+        return this.fromFunction((arr) => arr[index], finalOptions);
+    }
+    fromFunctionConcurrent(transformer, concurrency, options) {
+        const finalOptions = this.mergeOptions(options);
+        const input = this.passThrough(finalOptions);
+        const toArray = this.arrayJoin(concurrency, finalOptions);
+        const pickFromArrayLayer = [...Array(concurrency).keys()].map((a) => this.pickElementFromArray(a, finalOptions));
+        const actionLayer = [...Array(concurrency).keys()].map(() => this.fromAsyncFunction(transformer), finalOptions);
+        const output = this.passThrough(finalOptions);
+        concurrent_stream_output_ender_1.streamsManyToOneController(actionLayer, output);
+        input.pipe(toArray);
+        pickFromArrayLayer.forEach(picker => toArray.pipe(picker));
+        actionLayer.forEach((action, index) => pickFromArrayLayer[index].pipe(action));
+        actionLayer.forEach(action => {
+            action.pipe(output, { end: false });
+            action.on('error', (error) => output.emit('error', error));
+        });
+        return { input, output };
     }
 }
 exports.UtilityTransforms = UtilityTransforms;

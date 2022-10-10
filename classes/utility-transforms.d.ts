@@ -18,6 +18,11 @@ export declare class UtilityTransforms {
     fromFunction<TSource, TDestination>(transformer: TransformFunction<TSource, TDestination | undefined>, options?: TransformOptions): SimpleTransform<TSource, TDestination>;
     fromAsyncFunction<TSource, TDestination>(transformer: AsyncTransformFunction<TSource, TDestination | undefined>, options?: TransformOptions): SimpleAsyncTransform<TSource, TDestination>;
     passThrough<T>(options?: TransformOptions): TypedPassThrough<T>;
+    pickElementFromArray<T>(index: number, options?: TransformOptions): SimpleTransform<T[], T>;
+    fromFunctionConcurrent<TSource, TDestination>(transformer: AsyncTransformFunction<TSource, TDestination | undefined>, concurrency: number, options?: TransformOptions): {
+        input: TypedPassThrough<TSource>;
+        output: TypedPassThrough<number>;
+    };
 }
 export declare const utilityTransforms: UtilityTransforms;
 export declare const objectUtilityTransforms: UtilityTransforms;

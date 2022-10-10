@@ -236,6 +236,125 @@ describe('Test Utility transforms', () => {
             expect(result).toEqual(['3', '5', '7', '9']);
         }));
     });
+    describe('void', () => {
+        it('should ignore deleted data without blocking the stream', () => __awaiter(void 0, void 0, void 0, function* () {
+            const a = stream_1.Readable.from([[1, 2, 3, 4, 5, 6, 7, 8]]);
+            const b = a.pipe(utility_transforms_1.objectUtilityTransforms.void({ objectMode: true }));
+            const result = [];
+            b.on('data', (data) => {
+                result.push(data);
+            });
+            yield helpers_for_tests_1.streamEnd(b);
+            expect(result).toEqual([]);
+        }));
+    });
+    describe('pickElementFromArray', () => {
+        it('should pick the correct element', () => __awaiter(void 0, void 0, void 0, function* () {
+            const a = stream_1.Readable.from([[1, 2, 3], [4, 5, 6], [7, 8]]);
+            const b = a.pipe(utility_transforms_1.objectUtilityTransforms.pickElementFromArray(0));
+            const result = [];
+            b.on('data', (data) => {
+                result.push(data);
+            });
+            yield helpers_for_tests_1.streamEnd(b);
+            expect(result).toEqual([1, 4, 7]);
+        }));
+    });
+    describe('fromFunctionConcurrent', () => {
+        it('should return correct but unordered output', () => __awaiter(void 0, void 0, void 0, function* () {
+            const delay = 20;
+            const inputLength = 100;
+            const arr = [...Array(inputLength).keys()];
+            const expectedOutput = arr.map(n => n * 2);
+            const outArr = [];
+            const action = (n) => __awaiter(void 0, void 0, void 0, function* () {
+                yield new Promise(res => setTimeout(res, delay));
+                return n * 2;
+            });
+            const concurrency = 5;
+            const { input, output } = utility_transforms_1.objectUtilityTransforms.fromFunctionConcurrent(action, concurrency);
+            stream_1.Readable.from(arr).pipe(input);
+            output.on('data', (data) => {
+                outArr.push(data);
+            });
+            yield output.promisifyEvents(['end'], ['error']);
+            outArr.sort((a, b) => a - b);
+            expect(outArr).toEqual(expectedOutput);
+        }));
+        it('should take less time then running sequentially', () => __awaiter(void 0, void 0, void 0, function* () {
+            const delay = 20;
+            const inputLength = 100;
+            const estimatedRunTimeSequential = delay * inputLength;
+            const arr = [...Array(inputLength).keys()];
+            const outArr = [];
+            const startTime = Date.now();
+            const action = (n) => __awaiter(void 0, void 0, void 0, function* () {
+                yield new Promise(res => setTimeout(res, delay));
+                return n * 2;
+            });
+            const concurrency = 5;
+            const { input, output } = utility_transforms_1.objectUtilityTransforms.fromFunctionConcurrent(action, concurrency);
+            stream_1.Readable.from(arr).pipe(input);
+            output.on('data', (data) => {
+                outArr.push(data);
+            });
+            yield output.promisifyEvents(['end'], ['error']);
+            expect(estimatedRunTimeSequential).toBeGreaterThan(Date.now() - startTime);
+        }));
+        it('should fail send error to output if one of the concurrent actions fails', () => __awaiter(void 0, void 0, void 0, function* () {
+            const delay = 20;
+            const inputLength = 100;
+            const errorOnIndex = 20;
+            const arr = [...Array(inputLength).keys()];
+            const outArr = [];
+            const action = (n) => __awaiter(void 0, void 0, void 0, function* () {
+                if (n === errorOnIndex) {
+                    throw new Error('asdf');
+                }
+                yield new Promise(res => setTimeout(res, delay));
+                return n * 2;
+            });
+            const concurrency = 5;
+            const { input, output } = utility_transforms_1.objectUtilityTransforms.fromFunctionConcurrent(action, concurrency);
+            stream_1.Readable.from(arr).pipe(input);
+            output.on('data', (data) => {
+                outArr.push(data);
+            });
+            try {
+                yield output.promisifyEvents(['end'], ['error']);
+            }
+            catch (error) {
+                expect(error).toEqual(new Error('asdf'));
+                expect(outArr.length).toBeLessThan(errorOnIndex);
+            }
+            finally {
+                expect.assertions(2);
+            }
+        }));
+        it('doesnt break backpressure', () => __awaiter(void 0, void 0, void 0, function* () {
+            const delay = 20;
+            const inputLength = 100;
+            const arr = [...Array(inputLength).keys()];
+            const outArr = [];
+            let chunksPassedInInput = 0;
+            const action = (n) => __awaiter(void 0, void 0, void 0, function* () {
+                yield new Promise(res => setTimeout(res, delay));
+                return n * 2;
+            });
+            const concurrency = 2;
+            const { input, output } = utility_transforms_1.objectUtilityTransforms.fromFunctionConcurrent(action, concurrency);
+            stream_1.Readable.from(arr).pipe(input);
+            input.on('data', () => chunksPassedInInput++);
+            output.on('data', (data) => {
+                outArr.push(data);
+            });
+            yield input.promisifyEvents(['end'], ['error']);
+            expect(chunksPassedInInput).toEqual(inputLength);
+            expect(outArr.length).toBe(0);
+            yield output.promisifyEvents(['end'], ['error']);
+            expect(outArr.length).toBe(inputLength);
+        }));
+    });
     it('Able to mix different transforms in a single stream', () => __awaiter(void 0, void 0, void 0, function* () {
         const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
         const add1 = (n) => n + 1;
