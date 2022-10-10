@@ -1,6 +1,6 @@
 {
   "name": "easier-streams",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "make it easier to work with streams",
   "main": "index.js",
   "scripts": {
