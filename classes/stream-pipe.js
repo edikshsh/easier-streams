@@ -2,6 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStreamPipe = void 0;
 const Emitter_1 = require("../emitters/Emitter");
+/**
+ * Deprecated
+ * Use pipeHelper
+ */
 class StreamPipe extends Emitter_1.TypedEventEmitter {
     constructor(_source, _pipeline, _destination) {
         super();

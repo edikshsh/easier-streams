@@ -9,6 +9,10 @@ declare type StreamPipeEvents<T> = {
     close: () => void;
     error: (error: Error) => void;
 };
+/**
+ * Deprecated
+ * Use pipeHelper
+ */
 declare class StreamPipe<Tsource, Tdestination> extends TypedEventEmitter<StreamPipeEvents<Tdestination>> {
     private _source;
     private _pipeline;
@@ -24,6 +28,10 @@ declare class StreamPipe<Tsource, Tdestination> extends TypedEventEmitter<Stream
     } | undefined): T;
     unpipe(destination?: StreamPipe<unknown, unknown>): this;
 }
+/**
+ * Deprecated.
+ * Use pipeHelper
+ */
 export declare function getStreamPipe<T1, T2, T3>(...transforms: TypedTransformPipe_03<T1, T2, T3>): StreamPipe<T1, T3>;
 export declare function getStreamPipe<T1, T2, T3, T4>(...transforms: TypedTransformPipe_04<T1, T2, T3, T4>): StreamPipe<T1, T4>;
 export declare function getStreamPipe<T1, T2, T3, T4, T5>(...transforms: TypedTransformPipe_05<T1, T2, T3, T4, T5>): StreamPipe<T1, T5>;

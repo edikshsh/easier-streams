@@ -1,6 +1,6 @@
 {
   "name": "easier-streams",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "make it easier to work with streams",
   "main": "index.js",
   "scripts": {
@@ -8,11 +8,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "lodash.clonedeep": "^4.5.0"
+    "lodash.clonedeep": "^4.5.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/lodash.clonedeep": "^4.5.7",
     "@types/node": "^18.7.20",
+    "@types/uuid": "^8.3.4",
     "jest": "^27.0.6",
     "ts-jest": "^27.0.6"
   }

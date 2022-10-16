@@ -1,11 +1,12 @@
 /// <reference types="node" />
-import { TransformOptions } from "stream";
+import { FullTransformOptions } from "../types/full-transform-options.type";
 import { TypedTransformCallback } from "../types/typed-transform-callback";
 import { BaseTransform } from "./base-transform";
 import { TransformFunction } from "./simple-transform";
 export declare type AsyncTransformFunction<TSource, TDestination> = TransformFunction<TSource, Promise<TDestination>>;
 export declare class SimpleAsyncTransform<TSource, TDestination> extends BaseTransform<TSource, TDestination> {
     private transformer;
-    constructor(transformer: AsyncTransformFunction<TSource, TDestination | undefined>, options?: TransformOptions);
+    private options?;
+    constructor(transformer: AsyncTransformFunction<TSource, TDestination | undefined>, options?: FullTransformOptions<TSource> | undefined);
     _transform(chunk: TSource, encoding: BufferEncoding, callback: TypedTransformCallback<TDestination>): Promise<void>;
 }

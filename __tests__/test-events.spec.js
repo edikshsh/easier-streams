@@ -17,6 +17,12 @@ describe('TypedEventEmitter', () => {
         ee.emit('data', 12);
         yield expect(promise).resolves.toBe(12);
     }));
+    it('Should resolve correctly when sending event as string', () => __awaiter(void 0, void 0, void 0, function* () {
+        const ee = new Emitter_1.TypedEventEmitter();
+        const promise = ee.promisifyEvents('data');
+        ee.emit('data', 12);
+        yield expect(promise).resolves.toBe(12);
+    }));
     it('Should resolve correctly when emitting an array', () => __awaiter(void 0, void 0, void 0, function* () {
         const ee = new Emitter_1.TypedEventEmitter();
         const promise = ee.promisifyEvents(['muchData'], []);
@@ -26,6 +32,12 @@ describe('TypedEventEmitter', () => {
     it('Should reject correctly', () => __awaiter(void 0, void 0, void 0, function* () {
         const ee = new Emitter_1.TypedEventEmitter();
         const promise = ee.promisifyEvents([], ['error']);
+        setTimeout(() => ee.emit('error', Error('asdf')), 10);
+        yield expect(promise).rejects.toThrow(Error('asdf'));
+    }));
+    it('Should reject correctly when sending event as string', () => __awaiter(void 0, void 0, void 0, function* () {
+        const ee = new Emitter_1.TypedEventEmitter();
+        const promise = ee.promisifyEvents([], 'error');
         setTimeout(() => ee.emit('error', Error('asdf')), 10);
         yield expect(promise).rejects.toThrow(Error('asdf'));
     }));

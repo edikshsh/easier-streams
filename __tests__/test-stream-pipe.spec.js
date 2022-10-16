@@ -93,7 +93,6 @@ describe('Stream pipe', () => {
         const result = [];
         streamPipe.destination.on('data', (data) => result.push(data));
         yield helpers_for_tests_1.streamEnd(streamPipe.destination);
-        console.log(result);
         expect(result).toEqual(['4', '6', '8', '10']);
     }));
 });

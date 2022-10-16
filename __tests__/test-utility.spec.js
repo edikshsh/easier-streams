@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const stream_1 = require("stream");
+const pipe_helper_1 = require("../classes/pipe-helper");
 const utility_transforms_1 = require("../classes/utility-transforms");
 const helpers_for_tests_1 = require("./helpers-for-tests");
 describe('Test Utility transforms', () => {
@@ -43,12 +44,12 @@ describe('Test Utility transforms', () => {
                     modified.push(item);
                 };
                 const sideEffectsTransform = utility_transforms_1.objectUtilityTransforms.callOnDataSync(increaseBy10);
-                const b = a.pipe(sideEffectsTransform);
+                const pt = utility_transforms_1.objectUtilityTransforms.passThrough();
+                const b = a.pipe(sideEffectsTransform).pipe(pt);
                 const result = [];
                 const modified = [];
                 b.on('data', (data) => result.push(data));
-                b.on('error', () => undefined);
-                yield expect(b.promisifyEvents(['end', 'close'], ['error'])).rejects.toThrow(Error('aaaaa'));
+                yield expect(sideEffectsTransform.promisifyEvents(['end', 'close'], ['error'])).rejects.toThrow(Error('aaaaa'));
             }));
         });
         describe('async', () => {
@@ -117,6 +118,41 @@ describe('Test Utility transforms', () => {
             yield helpers_for_tests_1.streamEnd(b);
             expect(result).toEqual([2, 4, 6, 8]);
         }));
+        it('should filter out on crash', () => __awaiter(void 0, void 0, void 0, function* () {
+            const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
+            const filterOutOdds = (n) => {
+                if ((n % 2) === 1) {
+                    throw Error('asdf');
+                }
+                return true;
+            };
+            const b = a.pipe(utility_transforms_1.objectUtilityTransforms.filter(filterOutOdds));
+            const result = [];
+            b.on('data', (data) => result.push(data));
+            yield helpers_for_tests_1.streamEnd(b);
+            expect(result).toEqual([2, 4, 6, 8]);
+        }));
+        it('should pass error if given error stream', () => __awaiter(void 0, void 0, void 0, function* () {
+            const a = utility_transforms_1.objectUtilityTransforms.fromIterable([1, 2, 3, 4, 5, 6, 7, 8]);
+            const errorStream = utility_transforms_1.objectUtilityTransforms.errorTransform();
+            const passThrough = utility_transforms_1.objectUtilityTransforms.passThrough();
+            const filterOutOdds = (n) => {
+                if ((n % 2) === 1) {
+                    throw Error('asdf');
+                }
+                return true;
+            };
+            const b = utility_transforms_1.objectUtilityTransforms.filter(filterOutOdds, { errorStream });
+            pipe_helper_1.pipeHelper.pipe({ errorStream }, a, b, passThrough);
+            passThrough.on('data', () => undefined);
+            const result = [];
+            const errors = [];
+            passThrough.on('data', (data) => result.push(data));
+            errorStream.on('data', (error) => errors.push(error.data));
+            yield Promise.all([helpers_for_tests_1.streamEnd(b), helpers_for_tests_1.streamEnd(errorStream)]);
+            expect(result).toEqual([2, 4, 6, 8]);
+            expect(errors).toEqual([1, 3, 5, 7]);
+        }));
     });
     describe('void', () => {
         it('should throw away all data', () => __awaiter(void 0, void 0, void 0, function* () {
@@ -181,6 +217,43 @@ describe('Test Utility transforms', () => {
             yield helpers_for_tests_1.streamEnd(numberToStringTrasnform);
             expect(result).toEqual(['3', '5', '7', '9']);
         }));
+        it('passes errors to error stream instead of closing if given an error stream', () => __awaiter(void 0, void 0, void 0, function* () {
+            const a = utility_transforms_1.objectUtilityTransforms.fromIterable([1, 2, 3, 4, 5, 6, 7, 8]);
+            const errorStream = utility_transforms_1.objectUtilityTransforms.errorTransform();
+            const add1WithError = (n) => {
+                if (n % 2 === 0) {
+                    throw Error('asdf');
+                }
+                return n + 1;
+            };
+            const add1Transform = (utility_transforms_1.objectUtilityTransforms.fromFunction(add1WithError, { errorStream }));
+            pipe_helper_1.pipeHelper.pipeOneToOne(a, add1Transform);
+            const passThrough = utility_transforms_1.objectUtilityTransforms.passThrough();
+            pipe_helper_1.pipeHelper.pipeOneToOne(add1Transform, passThrough, { errorStream });
+            passThrough.on('data', () => undefined);
+            const result = [];
+            const errorResulst = [];
+            passThrough.on('data', (data) => result.push(data));
+            errorStream.on('data', (data) => errorResulst.push(data.data));
+            yield Promise.all([helpers_for_tests_1.streamEnd(add1Transform), helpers_for_tests_1.streamEnd(errorStream)]);
+            expect(result).toEqual([2, 4, 6, 8]);
+            expect(errorResulst).toEqual([2, 4, 6, 8]);
+        }));
+        it('doesnt pass errors to error stream if given an error stream witohut errors', () => __awaiter(void 0, void 0, void 0, function* () {
+            const a = utility_transforms_1.objectUtilityTransforms.fromIterable([1, 2, 3, 4, 5, 6, 7, 8]);
+            const errorStream = utility_transforms_1.objectUtilityTransforms.errorTransform();
+            const add1 = (n) => n + 1;
+            const add1Transform = (utility_transforms_1.objectUtilityTransforms.fromFunction(add1, { errorStream }));
+            pipe_helper_1.pipeHelper.pipeOneToOne(a, add1Transform, { errorStream });
+            pipe_helper_1.pipeHelper.pipeOneToOne(add1Transform, utility_transforms_1.objectUtilityTransforms.void(), { errorStream });
+            const result = [];
+            const errorResulst = [];
+            add1Transform.on('data', (data) => result.push(data));
+            errorStream.on('data', (data) => errorResulst.push(data.data));
+            yield Promise.all([helpers_for_tests_1.streamEnd(add1Transform), helpers_for_tests_1.streamEnd(errorStream)]);
+            expect(result).toEqual([2, 3, 4, 5, 6, 7, 8, 9]);
+            expect(errorResulst).toEqual([]);
+        }));
         describe('typedPassThrough', () => {
             it('should pass items correctly', () => __awaiter(void 0, void 0, void 0, function* () {
                 const arr = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -222,7 +295,7 @@ describe('Test Utility transforms', () => {
             const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
             const add1 = (n) => __awaiter(void 0, void 0, void 0, function* () { return n + 1; });
             const filterOutOdds = (n) => __awaiter(void 0, void 0, void 0, function* () {
-                yield new Promise(res => setTimeout(res, 100));
+                yield new Promise(res => setTimeout(res, 20));
                 return n % 2 ? n : undefined;
             });
             const numberToString = (n) => __awaiter(void 0, void 0, void 0, function* () { return n.toString(); });
@@ -235,10 +308,47 @@ describe('Test Utility transforms', () => {
             yield helpers_for_tests_1.streamEnd(numberToStringTrasnform);
             expect(result).toEqual(['3', '5', '7', '9']);
         }));
+        it('passes errors to error stream instead of closing if given an error stream', () => __awaiter(void 0, void 0, void 0, function* () {
+            const a = utility_transforms_1.objectUtilityTransforms.fromIterable([1, 2, 3, 4, 5, 6, 7, 8]);
+            const errorStream = utility_transforms_1.objectUtilityTransforms.errorTransform();
+            const add1WithError = (n) => __awaiter(void 0, void 0, void 0, function* () {
+                if (n % 2 === 0) {
+                    throw Error('asdf');
+                }
+                return n + 1;
+            });
+            const add1Transform = (utility_transforms_1.objectUtilityTransforms.fromAsyncFunction(add1WithError, { errorStream }));
+            pipe_helper_1.pipeHelper.pipeOneToOne(a, add1Transform);
+            const passThrough = utility_transforms_1.objectUtilityTransforms.passThrough();
+            pipe_helper_1.pipeHelper.pipeOneToOne(add1Transform, passThrough, { errorStream });
+            passThrough.on('data', () => undefined);
+            const result = [];
+            const errorResulst = [];
+            passThrough.on('data', (data) => result.push(data));
+            errorStream.on('data', (data) => errorResulst.push(data.data));
+            yield Promise.all([helpers_for_tests_1.streamEnd(add1Transform), helpers_for_tests_1.streamEnd(errorStream)]);
+            expect(result).toEqual([2, 4, 6, 8]);
+            expect(errorResulst).toEqual([2, 4, 6, 8]);
+        }));
+        it('doesnt pass errors to error stream if given an error stream witohut errors', () => __awaiter(void 0, void 0, void 0, function* () {
+            const a = utility_transforms_1.objectUtilityTransforms.fromIterable([1, 2, 3, 4, 5, 6, 7, 8]);
+            const errorStream = utility_transforms_1.objectUtilityTransforms.errorTransform();
+            const add1 = (n) => __awaiter(void 0, void 0, void 0, function* () { return n + 1; });
+            const add1Transform = (utility_transforms_1.objectUtilityTransforms.fromAsyncFunction(add1, { errorStream }));
+            pipe_helper_1.pipeHelper.pipeOneToOne(a, add1Transform, { errorStream });
+            pipe_helper_1.pipeHelper.pipeOneToOne(add1Transform, utility_transforms_1.objectUtilityTransforms.void(), { errorStream });
+            const result = [];
+            const errorResulst = [];
+            add1Transform.on('data', (data) => result.push(data));
+            errorStream.on('data', (data) => errorResulst.push(data.data));
+            yield Promise.all([helpers_for_tests_1.streamEnd(add1Transform), helpers_for_tests_1.streamEnd(errorStream)]);
+            expect(result).toEqual([2, 3, 4, 5, 6, 7, 8, 9]);
+            expect(errorResulst).toEqual([]);
+        }));
     });
     describe('void', () => {
         it('should ignore deleted data without blocking the stream', () => __awaiter(void 0, void 0, void 0, function* () {
-            const a = stream_1.Readable.from([[1, 2, 3, 4, 5, 6, 7, 8]]);
+            const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
             const b = a.pipe(utility_transforms_1.objectUtilityTransforms.void({ objectMode: true }));
             const result = [];
             b.on('data', (data) => {
@@ -353,6 +463,18 @@ describe('Test Utility transforms', () => {
             expect(outArr.length).toBe(0);
             yield output.promisifyEvents(['end'], ['error']);
             expect(outArr.length).toBe(inputLength);
+        }));
+    });
+    describe('fromIterable', () => {
+        it('output all data from iterable', () => __awaiter(void 0, void 0, void 0, function* () {
+            const arr = [1, 2, 3, 4, 5, 6, 7, 8];
+            const b = utility_transforms_1.objectUtilityTransforms.fromIterable(arr);
+            const result = [];
+            b.on('data', (data) => {
+                result.push(data);
+            });
+            yield helpers_for_tests_1.streamEnd(b);
+            expect(result).toEqual(arr);
         }));
     });
     it('Able to mix different transforms in a single stream', () => __awaiter(void 0, void 0, void 0, function* () {

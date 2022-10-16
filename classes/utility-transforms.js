@@ -14,12 +14,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.objectUtilityTransforms = exports.utilityTransforms = exports.UtilityTransforms = void 0;
 const lodash_clonedeep_1 = __importDefault(require("lodash.clonedeep"));
-const concurrent_stream_output_ender_1 = require("./concurrent-stream-output-ender");
+const stream_1 = require("stream");
+const error_stream_1 = require("./error-stream");
+const pipe_helper_1 = require("./pipe-helper");
 const simple_async_transform_1 = require("./simple-async-transform");
 const simple_transform_1 = require("./simple-transform");
 const TypedPassThrough_1 = require("./TypedPassThrough");
 const array_join_transform_1 = require("./utility-transforms/array-join-transform");
 const array_split_transform_1 = require("./utility-transforms/array-split-transform");
+// export type UtilityTransformsOptions<TSource> = {
+//     errorStream?: TypedTransform<StreamError<TSource>, unknown>
+// }
+// type FilterOptions = {
+//     filterOutOnError?: boolean;
+// }
+// function getDefaultFilterOptions():FilterOptions{
+//     return {
+//         filterOutOnError: true,
+//     }
+// }
 class UtilityTransforms {
     constructor(defaultTrasformOptions) {
         this.defaultTrasformOptions = defaultTrasformOptions;
@@ -27,6 +40,11 @@ class UtilityTransforms {
     mergeOptions(options) {
         return Object.assign({}, this.defaultTrasformOptions, options);
     }
+    // pipeErrorTransform<TSource, TDestination>(srcTransform: TypedTransform<TSource, TDestination>, errorTransform: TypedTransform<StreamError<TSource>, unknown>, options?: TransformOptions){
+    //     const id = v4();
+    //     srcTransform.pipe(this.filter(passStreamError(id))).pipe(errorTransform);
+    //     return srcTransform.pipe(this.filter(filterOutStreamError(id))); 
+    // }
     arrayJoin(length, options) {
         const finalOptions = this.mergeOptions(options);
         return new array_join_transform_1.ArrayJoinTransform(length, finalOptions);
@@ -63,7 +81,10 @@ class UtilityTransforms {
             try {
                 return filterFunction(chunk) ? chunk : undefined;
             }
-            catch (_a) {
+            catch (error) {
+                if (finalOptions.errorStream) {
+                    throw error;
+                }
                 return undefined;
             }
         };
@@ -92,15 +113,17 @@ class UtilityTransforms {
         const pickFromArrayLayer = [...Array(concurrency).keys()].map((a) => this.pickElementFromArray(a, finalOptions));
         const actionLayer = [...Array(concurrency).keys()].map(() => this.fromAsyncFunction(transformer), finalOptions);
         const output = this.passThrough(finalOptions);
-        concurrent_stream_output_ender_1.streamsManyToOneController(actionLayer, output);
-        input.pipe(toArray);
-        pickFromArrayLayer.forEach(picker => toArray.pipe(picker));
-        actionLayer.forEach((action, index) => pickFromArrayLayer[index].pipe(action));
-        actionLayer.forEach(action => {
-            action.pipe(output, { end: false });
-            action.on('error', (error) => output.emit('error', error));
-        });
+        actionLayer.forEach(action => action.on('error', (error) => output.emit('error', error)));
+        pipe_helper_1.pipeHelper.pipe(finalOptions, input, toArray, pickFromArrayLayer, actionLayer, output);
         return { input, output };
+    }
+    fromIterable(iterable, options) {
+        const finalOptions = this.mergeOptions(options);
+        return stream_1.Readable.from(iterable).pipe(this.passThrough(finalOptions));
+    }
+    errorTransform(options) {
+        const finalOptions = this.mergeOptions(options);
+        return new error_stream_1.ErrorTransform(finalOptions);
     }
 }
 exports.UtilityTransforms = UtilityTransforms;

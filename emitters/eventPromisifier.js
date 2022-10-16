@@ -13,6 +13,8 @@ exports.eventPromisifier = void 0;
 class EventPromisifier {
     _promisifyEvents(emitter, resolveEvents = [], rejectEvents = []) {
         return __awaiter(this, void 0, void 0, function* () {
+            resolveEvents = typeof resolveEvents === 'string' ? [resolveEvents] : resolveEvents;
+            rejectEvents = typeof rejectEvents === 'string' ? [rejectEvents] : rejectEvents;
             resolveEvents = resolveEvents.filter(event => event);
             rejectEvents = rejectEvents.filter(event => event);
             if (!(resolveEvents.length || rejectEvents.length)) {
