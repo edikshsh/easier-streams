@@ -10,10 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const stream_1 = require("stream");
-const simple_async_transform_1 = require("../classes/simple-async-transform");
-const simple_transform_1 = require("../classes/simple-transform");
-const array_join_transform_1 = require("../classes/utility-transforms/array-join-transform");
-const array_split_transform_1 = require("../classes/utility-transforms/array-split-transform");
+const simple_async_transform_1 = require("../streams/transforms/base/simple-async-transform");
+const simple_transform_1 = require("../streams/transforms/base/simple-transform");
+const array_join_transform_1 = require("../streams/transforms/utility/array-join-transform");
+const array_split_transform_1 = require("../streams/transforms/utility/array-split-transform");
 const helpers_for_tests_1 = require("./helpers-for-tests");
 describe('Test transforms', () => {
     describe('ArrayJoinTransform', () => {
@@ -131,53 +131,4 @@ describe('Test transforms', () => {
         expect(result).toEqual(['3', '5', '7', '9']);
     }));
 });
-// async function testArrayJoinTransform() {
-//     const a = Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
-//     const b = a.pipe(new ArrayJoinTransform(3, { objectMode: true }));
-//     const result: number[][] = [];
-//     b.on('data', (data: number[]) => result.push(data));
-//     await streamEnd(b)
-//     console.log(result);
-//     console.log('done');
-// }
-// async function testArraySplitTransform() {
-//     const a = Readable.from([[1, 2, 3], [4, 5, 6], [7, 8]]);
-//     const b = a.pipe(new ArraySplitTransform({ objectMode: true }));
-//     const result: number[] = [];
-//     b.on('data', (data: number) => result.push(data));
-//     await streamEnd(b)
-//     console.log(result);
-//     console.log('done');
-// }
-// async function testSimpleTransform() {
-//     const a = Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
-//     const add1 = (n: number) => n + 1;
-//     const filterOutOdds = (n: number) => n % 2 ? n : undefined;
-//     const numberToString = (n: number) => n.toString();
-//     const add1Transform = (new SimpleTransform(add1, { objectMode: true }));
-//     const filterOutOddsTranform = new SimpleTransform(filterOutOdds, { objectMode: true });
-//     const numberToStringTrasnform = new SimpleTransform(numberToString, { objectMode: true });
-//     a.pipe(add1Transform).pipe(filterOutOddsTranform).pipe(numberToStringTrasnform);
-//     const result: string[] = [];
-//     numberToStringTrasnform.on('data', (data) => result.push(data));
-//     await streamEnd(numberToStringTrasnform)
-//     console.log(result);
-//     console.log('done');
-// }
-// async function testSimpleAsyncTransform() {
-//     const a = Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
-//     const add1 = async (n: number) => n + 1;
-//     const filterOutOdds = async (n: number) => n % 2 ? n : undefined;
-//     const numberToString = async (n: number) => n.toString();
-//     const add1Transform = (new SimpleAsyncTransform(add1, { objectMode: true }));
-//     const filterOutOddsTranform = new SimpleAsyncTransform(filterOutOdds, { objectMode: true });
-//     const numberToStringTrasnform = new SimpleAsyncTransform(numberToString, { objectMode: true });
-//     a.pipe(add1Transform).pipe(filterOutOddsTranform).pipe(numberToStringTrasnform);
-//     const result: string[] = [];
-//     numberToStringTrasnform.on('data', (data) => result.push(data));
-//     await streamEnd(numberToStringTrasnform)
-//     console.log(result);
-//     console.log('done');
-// }
-// testSimpleTransform()
 //# sourceMappingURL=test.spec.js.map

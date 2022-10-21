@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const pipe_helper_1 = require("../classes/pipe-helper");
-const utility_transforms_1 = require("../classes/utility-transforms");
+const pipe_helper_1 = require("../streams/pipe-helper");
+const transforms_helper_1 = require("../streams/transforms-helper");
 describe('pipeHelper', () => {
     let sourceTransform;
     let sourceTransforms;
@@ -25,10 +25,10 @@ describe('pipeHelper', () => {
     };
     beforeEach(() => {
         sourceData = [1, 2, 3, 4, 5, 6, 7, 8];
-        sourceTransform = utility_transforms_1.objectUtilityTransforms.fromIterable(sourceData);
-        sourceTransforms = [0, 0].map((_, index) => utility_transforms_1.objectUtilityTransforms.fromIterable([0, 1, 2, 3].map(a => a + (index * 4) + 1)));
-        destinationTransform = utility_transforms_1.objectUtilityTransforms.passThrough();
-        destinationTransforms = [0, 0].map(() => utility_transforms_1.objectUtilityTransforms.passThrough());
+        sourceTransform = transforms_helper_1.objectTransformsHelper.fromIterable(sourceData);
+        sourceTransforms = [0, 0].map((_, index) => transforms_helper_1.objectTransformsHelper.fromIterable([0, 1, 2, 3].map(a => a + (index * 4) + 1)));
+        destinationTransform = transforms_helper_1.objectTransformsHelper.passThrough();
+        destinationTransforms = [0, 0].map(() => transforms_helper_1.objectTransformsHelper.passThrough());
     });
     describe('pipeOneToOne', () => {
         it('should pass data', () => __awaiter(void 0, void 0, void 0, function* () {
@@ -39,8 +39,8 @@ describe('pipeHelper', () => {
             expect(result).toEqual(sourceData);
         }));
         it('should pass error data', () => __awaiter(void 0, void 0, void 0, function* () {
-            const errorStream = utility_transforms_1.objectUtilityTransforms.errorTransform();
-            const source = sourceTransform.pipe(utility_transforms_1.objectUtilityTransforms.fromFunction(errorOnEvenFunc, { errorStream }));
+            const errorStream = transforms_helper_1.objectTransformsHelper.errorTransform();
+            const source = sourceTransform.pipe(transforms_helper_1.objectTransformsHelper.fromFunction(errorOnEvenFunc, { errorStream }));
             pipe_helper_1.pipeHelper.pipeOneToOne(source, destinationTransform, { errorStream });
             const result = [];
             const errors = [];
@@ -51,7 +51,7 @@ describe('pipeHelper', () => {
             expect(errors).toEqual([2, 4, 6, 8]);
         }));
         it('should error correctly when not piped to error stream', () => __awaiter(void 0, void 0, void 0, function* () {
-            const source = sourceTransform.pipe(utility_transforms_1.objectUtilityTransforms.fromFunction(errorOnEvenFunc));
+            const source = sourceTransform.pipe(transforms_helper_1.objectTransformsHelper.fromFunction(errorOnEvenFunc));
             pipe_helper_1.pipeHelper.pipeOneToOne(source, destinationTransform);
             const promise = Promise.all([destinationTransform.promisifyEvents(['end'], ['error']), source.promisifyEvents([], ['error'])]);
             yield expect(promise).rejects.toThrow(new Error('asdf'));
@@ -67,8 +67,8 @@ describe('pipeHelper', () => {
             expect(result).toEqual(expectedResults);
         }));
         it('should pass error data', () => __awaiter(void 0, void 0, void 0, function* () {
-            const errorStream = utility_transforms_1.objectUtilityTransforms.errorTransform();
-            const source = sourceTransform.pipe(utility_transforms_1.objectUtilityTransforms.fromFunction(errorOnEvenFunc, { errorStream }));
+            const errorStream = transforms_helper_1.objectTransformsHelper.errorTransform();
+            const source = sourceTransform.pipe(transforms_helper_1.objectTransformsHelper.fromFunction(errorOnEvenFunc, { errorStream }));
             pipe_helper_1.pipeHelper.pipeOneToMany(source, destinationTransforms, { errorStream });
             const result = [];
             const errors = [];
@@ -90,8 +90,8 @@ describe('pipeHelper', () => {
             expect(sortedResult).toEqual(sourceData);
         }));
         it('should pass error data', () => __awaiter(void 0, void 0, void 0, function* () {
-            const errorStream = utility_transforms_1.objectUtilityTransforms.errorTransform();
-            const sources = sourceTransforms.map((sourceTransform) => sourceTransform.pipe(utility_transforms_1.objectUtilityTransforms.fromFunction(errorOnEvenFunc, { errorStream })));
+            const errorStream = transforms_helper_1.objectTransformsHelper.errorTransform();
+            const sources = sourceTransforms.map((sourceTransform) => sourceTransform.pipe(transforms_helper_1.objectTransformsHelper.fromFunction(errorOnEvenFunc, { errorStream })));
             pipe_helper_1.pipeHelper.pipeManyToOne(sources, destinationTransform, { errorStream });
             const result = [];
             const errors = [];
@@ -102,7 +102,7 @@ describe('pipeHelper', () => {
             expect(errors).toEqual([2, 4, 6, 8]);
         }));
         it('should error correctly when not piped to error stream', () => __awaiter(void 0, void 0, void 0, function* () {
-            const sources = sourceTransforms.map((sourceTransform) => sourceTransform.pipe(utility_transforms_1.objectUtilityTransforms.fromFunction(errorOnEvenFunc)));
+            const sources = sourceTransforms.map((sourceTransform) => sourceTransform.pipe(transforms_helper_1.objectTransformsHelper.fromFunction(errorOnEvenFunc)));
             pipe_helper_1.pipeHelper.pipeManyToOne(sources, destinationTransform);
             destinationTransform.on('data', () => undefined);
             const promise = Promise.all([destinationTransform.promisifyEvents(['end']), ...sources.map(source => source.promisifyEvents([], ['error']))]);
@@ -119,8 +119,8 @@ describe('pipeHelper', () => {
             expect(sortedResult).toEqual(sourceData);
         }));
         it('should pass error data', () => __awaiter(void 0, void 0, void 0, function* () {
-            const errorStream = utility_transforms_1.objectUtilityTransforms.errorTransform();
-            const sources = sourceTransforms.map((sourceTransform) => sourceTransform.pipe(utility_transforms_1.objectUtilityTransforms.fromFunction(errorOnEvenFunc, { errorStream })));
+            const errorStream = transforms_helper_1.objectTransformsHelper.errorTransform();
+            const sources = sourceTransforms.map((sourceTransform) => sourceTransform.pipe(transforms_helper_1.objectTransformsHelper.fromFunction(errorOnEvenFunc, { errorStream })));
             pipe_helper_1.pipeHelper.pipeManyToMany(sources, destinationTransforms, { errorStream });
             const result = [];
             const errors = [];
@@ -131,12 +131,12 @@ describe('pipeHelper', () => {
             expect(errors).toEqual([2, 4, 6, 8]);
         }));
     });
-    describe('pipe ', () => {
+    describe('pipe', () => {
         it('should pass data', () => __awaiter(void 0, void 0, void 0, function* () {
-            const layer1 = utility_transforms_1.objectUtilityTransforms.passThrough();
-            const layer2 = [0, 1].map(() => utility_transforms_1.objectUtilityTransforms.passThrough());
-            const layer3 = [0, 1].map(() => utility_transforms_1.objectUtilityTransforms.passThrough());
-            const layer4 = utility_transforms_1.objectUtilityTransforms.passThrough();
+            const layer1 = transforms_helper_1.objectTransformsHelper.passThrough();
+            const layer2 = [0, 1].map(() => transforms_helper_1.objectTransformsHelper.passThrough());
+            const layer3 = [0, 1].map(() => transforms_helper_1.objectTransformsHelper.passThrough());
+            const layer4 = transforms_helper_1.objectTransformsHelper.passThrough();
             pipe_helper_1.pipeHelper.pipe({}, sourceTransform, layer1, layer2, layer3, layer4);
             const result = [];
             layer4.on('data', (data) => result.push(data));
@@ -152,12 +152,12 @@ describe('pipeHelper', () => {
                 }
                 return n;
             };
-            const errorStream = utility_transforms_1.objectUtilityTransforms.errorTransform();
-            const layer1 = utility_transforms_1.objectUtilityTransforms.fromFunction(errorOnInput(1), { errorStream });
-            const layer2 = [0, 1].map(() => utility_transforms_1.objectUtilityTransforms.fromFunction(errorOnInput(2), { errorStream }));
-            const layer3 = [0, 1].map(() => utility_transforms_1.objectUtilityTransforms.fromFunction(errorOnInput(3), { errorStream }));
-            const layer4 = utility_transforms_1.objectUtilityTransforms.fromFunction(errorOnInput(4), { errorStream });
-            const layer5 = utility_transforms_1.objectUtilityTransforms.passThrough();
+            const errorStream = transforms_helper_1.objectTransformsHelper.errorTransform();
+            const layer1 = transforms_helper_1.objectTransformsHelper.fromFunction(errorOnInput(1), { errorStream });
+            const layer2 = [0, 1].map(() => transforms_helper_1.objectTransformsHelper.fromFunction(errorOnInput(2), { errorStream }));
+            const layer3 = [0, 1].map(() => transforms_helper_1.objectTransformsHelper.fromFunction(errorOnInput(3), { errorStream }));
+            const layer4 = transforms_helper_1.objectTransformsHelper.fromFunction(errorOnInput(4), { errorStream });
+            const layer5 = transforms_helper_1.objectTransformsHelper.passThrough();
             pipe_helper_1.pipeHelper.pipe({ errorStream }, sourceTransform, layer1, layer2, layer3, layer4, layer5);
             const result = [];
             const errors = [];
@@ -175,12 +175,12 @@ describe('pipeHelper', () => {
             }
             return n;
         };
-        const errorStream = utility_transforms_1.objectUtilityTransforms.errorTransform();
-        const layer1 = utility_transforms_1.objectUtilityTransforms.fromFunction(errorOnInput(1), { errorStream });
-        const layer2 = [0, 1].map(() => utility_transforms_1.objectUtilityTransforms.fromFunction(errorOnInput(2), { errorStream }));
-        const layer3_failing = [0, 1].map(() => utility_transforms_1.objectUtilityTransforms.fromFunction(errorOnInput(5, 'layer3')));
-        const layer4 = utility_transforms_1.objectUtilityTransforms.fromFunction(errorOnInput(3), { errorStream });
-        const layer5 = utility_transforms_1.objectUtilityTransforms.passThrough();
+        const errorStream = transforms_helper_1.objectTransformsHelper.errorTransform();
+        const layer1 = transforms_helper_1.objectTransformsHelper.fromFunction(errorOnInput(1), { errorStream });
+        const layer2 = [0, 1].map(() => transforms_helper_1.objectTransformsHelper.fromFunction(errorOnInput(2), { errorStream }));
+        const layer3_failing = [0, 1].map(() => transforms_helper_1.objectTransformsHelper.fromFunction(errorOnInput(5, 'layer3')));
+        const layer4 = transforms_helper_1.objectTransformsHelper.fromFunction(errorOnInput(3), { errorStream });
+        const layer5 = transforms_helper_1.objectTransformsHelper.passThrough();
         pipe_helper_1.pipeHelper.pipe({ errorStream }, sourceTransform, layer1, layer2, layer3_failing);
         pipe_helper_1.pipeHelper.pipe({}, layer3_failing, layer4);
         pipe_helper_1.pipeHelper.pipe({ errorStream }, layer4, layer5);

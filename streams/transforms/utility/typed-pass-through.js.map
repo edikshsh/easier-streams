@@ -1,0 +1,1 @@
+{"version":3,"file":"typed-pass-through.js","sourceRoot":"","sources":["../../../../src/streams/transforms/utility/typed-pass-through.ts"],"names":[],"mappings":";;;AACA,2DAAuD;AAIvD,MAAa,gBAAoB,SAAQ,8BAAmB;IACxD,YAAY,OAAyB;QACjC,KAAK,CAAC,OAAO,CAAC,CAAC;IACnB,CAAC;IAED,UAAU,CAAC,KAAQ,EAAE,QAAwB,EAAE,QAAmC;QAC9E,QAAQ,CAAC,IAAI,EAAE,KAAK,CAAC,CAAC;IAC1B,CAAC;CACJ;AARD,4CAQC"}
