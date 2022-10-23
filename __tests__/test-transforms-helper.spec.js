@@ -153,6 +153,20 @@ describe('Test Utility transforms', () => {
             expect(errors).toEqual([1, 3, 5, 7]);
         }));
     });
+    // function isNumber(n: unknown): n is number{
+    //     return typeof n === 'number'
+    // }
+    describe('filterType', () => {
+        it('should filter out by type correctly', () => __awaiter(void 0, void 0, void 0, function* () {
+            const a = stream_1.Readable.from([1, '2', 3, '4', 5, '6', 7, '8']);
+            function isNumber(n) { return typeof n === 'number'; }
+            const b = a.pipe(transforms_helper_1.objectTransformsHelper.typeFilter(isNumber));
+            const result = [];
+            b.on('data', (data) => result.push(data));
+            yield helpers_for_tests_1.streamEnd(b);
+            expect(result).toEqual([1, 3, 5, 7]);
+        }));
+    });
     describe('asyncFilter', () => {
         it('should filter out correctly', () => __awaiter(void 0, void 0, void 0, function* () {
             const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);

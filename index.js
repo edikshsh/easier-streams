@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StreamError = exports.ErrorTransform = exports.voidInputTransform = exports.TypedEventEmitter = exports.TypedPassThrough = exports.pickElementFromArrayTransform = exports.fromIterable = exports.fromAsyncFunctionTransform = exports.fromFunctionTransform = exports.fromFunctionConcurrentTransform = exports.asyncFilterTransform = exports.filterTransform = exports.callOnDataAsyncTransform = exports.callOnDataSyncTransform = exports.ArraySplitTransform = exports.ArrayJoinTransform = exports.BaseTransform = exports.SimpleAsyncTransform = exports.SimpleTransform = exports.StreamPipe = exports.pipeHelper = exports.TransformsHelper = exports.objectTransformsHelper = exports.transformsHelper = void 0;
+exports.StreamError = exports.ErrorTransform = exports.voidInputTransform = exports.TypedEventEmitter = exports.TypedPassThrough = exports.pickElementFromArrayTransform = exports.fromIterable = exports.fromAsyncFunctionTransform = exports.fromFunctionTransform = exports.fromFunctionConcurrentTransform = exports.typeFilterTransform = exports.asyncFilterTransform = exports.filterTransform = exports.callOnDataAsyncTransform = exports.callOnDataSyncTransform = exports.ArraySplitTransform = exports.ArrayJoinTransform = exports.BaseTransform = exports.SimpleAsyncTransform = exports.SimpleTransform = exports.StreamPipe = exports.pipeHelper = exports.TransformsHelper = exports.objectTransformsHelper = exports.transformsHelper = void 0;
 const transforms_helper_1 = require("./streams/transforms-helper");
 Object.defineProperty(exports, "objectTransformsHelper", { enumerable: true, get: function () { return transforms_helper_1.objectTransformsHelper; } });
 Object.defineProperty(exports, "TransformsHelper", { enumerable: true, get: function () { return transforms_helper_1.TransformsHelper; } });
@@ -24,6 +24,8 @@ Object.defineProperty(exports, "callOnDataSyncTransform", { enumerable: true, ge
 const filter_transforms_1 = require("./streams/transforms/utility/filter-transforms");
 Object.defineProperty(exports, "asyncFilterTransform", { enumerable: true, get: function () { return filter_transforms_1.asyncFilterTransform; } });
 Object.defineProperty(exports, "filterTransform", { enumerable: true, get: function () { return filter_transforms_1.filterTransform; } });
+const type_filter_transforms_1 = require("./streams/transforms/utility/type-filter-transforms");
+Object.defineProperty(exports, "typeFilterTransform", { enumerable: true, get: function () { return type_filter_transforms_1.typeFilterTransform; } });
 const from_function_concurrent_transform_1 = require("./streams/transforms/utility/from-function-concurrent-transform");
 Object.defineProperty(exports, "fromFunctionConcurrentTransform", { enumerable: true, get: function () { return from_function_concurrent_transform_1.fromFunctionConcurrentTransform; } });
 const from_function_transforms_1 = require("./streams/transforms/utility/from-function-transforms");

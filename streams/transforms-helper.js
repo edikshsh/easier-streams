@@ -12,6 +12,7 @@ const from_iterable_transform_1 = require("./transforms/utility/from-iterable-tr
 const typed_pass_through_1 = require("./transforms/utility/typed-pass-through");
 const pick_element_from_array_transform_1 = require("./transforms/utility/pick-element-from-array-transform");
 const array_join_transform_1 = require("./transforms/utility/array-join-transform");
+const type_filter_transforms_1 = require("./transforms/utility/type-filter-transforms");
 class TransformsHelperBase {
     constructor(defaultTrasformOptions) {
         this.defaultTrasformOptions = defaultTrasformOptions;
@@ -53,6 +54,10 @@ class TransformsHelper extends TransformsHelperBase {
     filter(filterFunction, options) {
         const finalOptions = this.mergeOptions(options);
         return filter_transforms_1.filterTransform(filterFunction, finalOptions);
+    }
+    typeFilter(filterFunction, options) {
+        const finalOptions = this.mergeOptions(options);
+        return type_filter_transforms_1.typeFilterTransform(filterFunction, finalOptions);
     }
     fromFunction(transformer, options) {
         const finalOptions = this.mergeOptions(options);

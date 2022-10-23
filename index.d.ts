@@ -9,6 +9,7 @@ import { ArrayJoinTransform } from "./streams/transforms/utility/array-join-tran
 import { ArraySplitTransform } from "./streams/transforms/utility/array-split-transform";
 import { callOnDataAsyncTransform, callOnDataSyncTransform } from "./streams/transforms/utility/call-on-data-transforms";
 import { asyncFilterTransform, filterTransform } from "./streams/transforms/utility/filter-transforms";
+import { typeFilterTransform } from "./streams/transforms/utility/type-filter-transforms";
 import { fromFunctionConcurrentTransform } from "./streams/transforms/utility/from-function-concurrent-transform";
 import { fromAsyncFunctionTransform, fromFunctionTransform } from "./streams/transforms/utility/from-function-transforms";
 import { fromIterable } from "./streams/transforms/utility/from-iterable-transform";
@@ -19,4 +20,4 @@ import { voidInputTransform } from "./streams/transforms/utility/void-input-tran
 import { ErrorTransform } from './streams/errors/error-transform';
 import { StreamError } from "./streams/errors/stream-error";
 declare const StreamPipe: typeof getStreamPipe;
-export { transformsHelper, objectTransformsHelper, TransformsHelper, pipeHelper, StreamPipe, SimpleTransform, SimpleAsyncTransform, BaseTransform, TypedTransform, ArrayJoinTransform, ArraySplitTransform, callOnDataSyncTransform, callOnDataAsyncTransform, filterTransform, asyncFilterTransform, fromFunctionConcurrentTransform, fromFunctionTransform, fromAsyncFunctionTransform, fromIterable, pickElementFromArrayTransform, TypedPassThrough, TypedEventEmitter, voidInputTransform, ErrorTransform, StreamError };
+export { transformsHelper, objectTransformsHelper, TransformsHelper, pipeHelper, StreamPipe, SimpleTransform, SimpleAsyncTransform, BaseTransform, TypedTransform, ArrayJoinTransform, ArraySplitTransform, callOnDataSyncTransform, callOnDataAsyncTransform, filterTransform, asyncFilterTransform, typeFilterTransform, fromFunctionConcurrentTransform, fromFunctionTransform, fromAsyncFunctionTransform, fromIterable, pickElementFromArrayTransform, TypedPassThrough, TypedEventEmitter, voidInputTransform, ErrorTransform, StreamError };

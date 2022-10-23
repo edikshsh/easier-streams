@@ -22,6 +22,7 @@ export declare class TransformsHelper extends TransformsHelperBase {
     void<TSource>(options?: FullTransformOptions<TSource>): SimpleTransform<TSource, void>;
     passThrough<T>(options?: FullTransformOptions<T>): TypedPassThrough<T>;
     filter<TSource>(filterFunction: (chunk: TSource) => boolean, options?: FullTransformOptions<TSource>): SimpleTransform<TSource, TSource>;
+    typeFilter<TSource, TDestination extends TSource>(filterFunction: (chunk: TSource) => chunk is TDestination, options?: FullTransformOptions<TSource>): SimpleTransform<TSource, TDestination>;
     fromFunction<TSource, TDestination>(transformer: TransformFunction<TSource, TDestination | undefined>, options?: FullTransformOptions<TSource>): SimpleTransform<TSource, TDestination>;
     pickElementFromArray<T>(index: number, options?: FullTransformOptions<T[]>): SimpleTransform<T[], T>;
     fromIterable<T>(iterable: Iterable<T>, options?: TransformOptions): TypedPassThrough<T>;
