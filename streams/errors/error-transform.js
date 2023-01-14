@@ -9,12 +9,12 @@ class ErrorTransform extends base_transform_1.BaseTransform {
         this.streamGroupControllerEventCounter = {
             close: 0,
             end: 0,
-            finish: 0
+            finish: 0,
         };
         this.totalInputs = 0;
     }
     _transform(chunk, encoding, callback) {
-        if (is_stream_error_1.isStreamError(chunk)) {
+        if ((0, is_stream_error_1.isStreamError)(chunk)) {
             return callback(null, chunk);
         }
         return callback();
@@ -27,7 +27,7 @@ class ErrorTransform extends base_transform_1.BaseTransform {
         for (const event in this.streamGroupControllerEventCounter) {
             inputLayer.forEach((input) => {
                 input.once(event, () => {
-                    const inputsCalledCurrentEvent = (++this.streamGroupControllerEventCounter[event]);
+                    const inputsCalledCurrentEvent = ++this.streamGroupControllerEventCounter[event];
                     if (inputsCalledCurrentEvent === this.totalInputs) {
                         output.emit(event);
                     }

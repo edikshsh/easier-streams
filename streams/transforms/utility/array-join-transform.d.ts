@@ -1,7 +1,8 @@
 /// <reference types="node" />
-import { TransformCallback, TransformOptions } from "stream";
-import { BaseTransform } from "../base/base-transform";
-import { TypedTransformCallback } from "../types/typed-transform-callback";
+/// <reference types="node" />
+import { TransformCallback, TransformOptions } from 'stream';
+import { BaseTransform } from '../base/base-transform';
+import { TypedTransformCallback } from '../types/typed-transform-callback';
 export declare class ArrayJoinTransform<TSource> extends BaseTransform<TSource, TSource[]> {
     private length;
     array: TSource[];

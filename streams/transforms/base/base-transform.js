@@ -7,16 +7,14 @@ class BaseTransform extends stream_1.Transform {
     constructor(options) {
         super(options);
     }
-    isSingleKey(keys) {
-        return typeof keys === 'string' || typeof keys === 'symbol';
+    isKeyArray(keys) {
+        return Array.isArray(keys);
     }
     keysToStringArray(keys) {
-        if (this.isSingleKey(keys)) {
-            return [keys.toString()];
+        if (this.isKeyArray(keys)) {
+            return (keys === null || keys === void 0 ? void 0 : keys.map((event) => event.toString())) || [];
         }
-        else {
-            return (keys === null || keys === void 0 ? void 0 : keys.map(event => event.toString())) || [];
-        }
+        return keys ? [keys.toString()] : [];
     }
     promisifyEvents(resolveEvents, rejectEvents) {
         return eventPromisifier_1.eventPromisifier._promisifyEvents(this, this.keysToStringArray(resolveEvents), this.keysToStringArray(rejectEvents));

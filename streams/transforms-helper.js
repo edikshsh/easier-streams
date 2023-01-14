@@ -41,11 +41,11 @@ class TransformsHelper extends TransformsHelperBase {
     }
     callOnDataSync(functionToCallOnData, options) {
         const finalOptions = this.mergeOptions(options);
-        return call_on_data_transforms_1.callOnDataSyncTransform(functionToCallOnData, finalOptions);
+        return (0, call_on_data_transforms_1.callOnDataSyncTransform)(functionToCallOnData, finalOptions);
     }
     void(options) {
         const finalOptions = this.mergeOptions(options);
-        return void_input_transform_1.voidInputTransform(finalOptions);
+        return (0, void_input_transform_1.voidInputTransform)(finalOptions);
     }
     passThrough(options) {
         const finalOptions = this.mergeOptions(options);
@@ -53,46 +53,50 @@ class TransformsHelper extends TransformsHelperBase {
     }
     filter(filterFunction, options) {
         const finalOptions = this.mergeOptions(options);
-        return filter_transforms_1.filterTransform(filterFunction, finalOptions);
+        return (0, filter_transforms_1.filterTransform)(filterFunction, finalOptions);
     }
     typeFilter(filterFunction, options) {
         const finalOptions = this.mergeOptions(options);
-        return type_filter_transforms_1.typeFilterTransform(filterFunction, finalOptions);
+        return (0, type_filter_transforms_1.typeFilterTransform)(filterFunction, finalOptions);
     }
     fromFunction(transformer, options) {
         const finalOptions = this.mergeOptions(options);
-        return from_function_transforms_1.fromFunctionTransform(transformer, finalOptions);
+        return (0, from_function_transforms_1.fromFunctionTransform)(transformer, finalOptions);
     }
     pickElementFromArray(index, options) {
         const finalOptions = this.mergeOptions(options);
-        return pick_element_from_array_transform_1.pickElementFromArrayTransform(index, finalOptions);
+        return (0, pick_element_from_array_transform_1.pickElementFromArrayTransform)(index, finalOptions);
     }
     fromIterable(iterable, options) {
         const finalOptions = this.mergeOptions(options);
-        return from_iterable_transform_1.fromIterable(iterable, finalOptions);
+        return (0, from_iterable_transform_1.fromIterable)(iterable, finalOptions);
     }
 }
 exports.TransformsHelper = TransformsHelper;
 class AsyncTransformsHelper extends TransformsHelperBase {
     callOnData(functionToCallOnData, options) {
         const finalOptions = this.mergeOptions(options);
-        return call_on_data_transforms_1.callOnDataAsyncTransform(functionToCallOnData, finalOptions);
+        return (0, call_on_data_transforms_1.callOnDataAsyncTransform)(functionToCallOnData, finalOptions);
     }
     filter(filterFunction, options) {
         const finalOptions = this.mergeOptions(options);
-        return filter_transforms_1.asyncFilterTransform(filterFunction, finalOptions);
+        return (0, filter_transforms_1.asyncFilterTransform)(filterFunction, finalOptions);
     }
     fromFunction(transformer, options) {
         const finalOptions = this.mergeOptions(options);
-        return from_function_transforms_1.fromAsyncFunctionTransform(transformer, finalOptions);
+        return (0, from_function_transforms_1.fromAsyncFunctionTransform)(transformer, finalOptions);
     }
     fromFunctionConcurrent(transformer, concurrency, options) {
         const finalOptions = this.mergeOptions(options);
-        return from_function_concurrent_transform_1.fromFunctionConcurrentTransform(transformer, concurrency, finalOptions);
+        return (0, from_function_concurrent_transform_1.fromFunctionConcurrentTransform)(transformer, concurrency, finalOptions);
+    }
+    fromFunctionConcurrent2(transformer, concurrency, options) {
+        const finalOptions = this.mergeOptions(options);
+        return (0, from_function_concurrent_transform_1.fromFunctionConcurrentTransform2)(transformer, concurrency, finalOptions);
     }
     fromIterable(iterable, options) {
         const finalOptions = this.mergeOptions(options);
-        return from_iterable_transform_1.fromIterable(iterable, finalOptions);
+        return (0, from_iterable_transform_1.fromIterable)(iterable, finalOptions);
     }
 }
 exports.AsyncTransformsHelper = AsyncTransformsHelper;

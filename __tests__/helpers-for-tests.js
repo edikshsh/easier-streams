@@ -17,13 +17,13 @@ describe('asdf', () => {
 });
 function sleep(n) {
     return __awaiter(this, void 0, void 0, function* () {
-        return new Promise(res => setTimeout(res, n));
+        return new Promise((res) => setTimeout(res, n));
     });
 }
 exports.sleep = sleep;
 function streamEnd(stream) {
     return __awaiter(this, void 0, void 0, function* () {
-        return new Promise(res => stream.on('close', res));
+        return new Promise((res) => stream.on('close', res));
     });
 }
 exports.streamEnd = streamEnd;

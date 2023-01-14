@@ -17,17 +17,4 @@ function typeFilterTransform(typeFilterFunction, options) {
     return new simple_transform_1.SimpleTransform(filter, options);
 }
 exports.typeFilterTransform = typeFilterTransform;
-// export function asyncFilterTransform<TSource, TDestination extends TSource>(typeFilterFunction: (chunk: TSource) => Promise<boolean>, options?: FullTransformOptions<TSource>) {
-//     const filter = async (chunk: TSource) => {
-//         try {
-//             return (await filterFunction(chunk)) ? chunk : undefined
-//         } catch (error) {
-//             if (options?.errorStream) {
-//                 throw error
-//             }
-//             return undefined;
-//         }
-//     }
-//     return new SimpleAsyncTransform<TSource, TSource>(filter, options);
-// }
 //# sourceMappingURL=type-filter-transforms.js.map

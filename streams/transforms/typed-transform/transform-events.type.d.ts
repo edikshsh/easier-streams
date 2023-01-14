@@ -1,4 +1,4 @@
-export declare type TransformEvents<T> = {
+export type TransformEvents<T> = {
     data: (chunk: T) => void;
     end: () => void;
     close: () => void;

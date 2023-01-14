@@ -4,16 +4,14 @@ exports.TypedEventEmitter = void 0;
 const stream_1 = require("stream");
 const eventPromisifier_1 = require("./eventPromisifier");
 class TypedEventEmitter extends stream_1.EventEmitter {
-    isSingleKey(keys) {
-        return typeof keys === 'string' || typeof keys === 'symbol';
+    isKeyArray(keys) {
+        return Array.isArray(keys);
     }
     keysToStringArray(keys) {
-        if (this.isSingleKey(keys)) {
-            return [keys.toString()];
+        if (this.isKeyArray(keys)) {
+            return (keys === null || keys === void 0 ? void 0 : keys.map((event) => event.toString())) || [];
         }
-        else {
-            return (keys === null || keys === void 0 ? void 0 : keys.map(event => event.toString())) || [];
-        }
+        return keys ? [keys.toString()] : [];
     }
     promisifyEvents(resolveEvents, rejectEvents) {
         const stringResolveEvents = this.keysToStringArray(resolveEvents);

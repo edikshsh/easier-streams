@@ -18,7 +18,7 @@ const simple_async_transform_1 = require("../base/simple-async-transform");
 const simple_transform_1 = require("../base/simple-transform");
 function callOnDataSyncTransform(functionToCallOnData, options) {
     const callOnData = (data) => {
-        const dataCopy = lodash_clonedeep_1.default(data);
+        const dataCopy = (0, lodash_clonedeep_1.default)(data);
         functionToCallOnData(dataCopy);
         return data;
     };
@@ -27,7 +27,7 @@ function callOnDataSyncTransform(functionToCallOnData, options) {
 exports.callOnDataSyncTransform = callOnDataSyncTransform;
 function callOnDataAsyncTransform(functionToCallOnData, options) {
     const callOnData = (data) => __awaiter(this, void 0, void 0, function* () {
-        const dataCopy = lodash_clonedeep_1.default(data);
+        const dataCopy = (0, lodash_clonedeep_1.default)(data);
         yield functionToCallOnData(dataCopy);
         return data;
     });

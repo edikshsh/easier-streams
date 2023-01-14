@@ -22,56 +22,62 @@ describe('Stream pipe', () => {
         const add1 = (n) => __awaiter(void 0, void 0, void 0, function* () { return n + 1; });
         const create3ElementsFrom1 = (n) => [n + 1, n + 2, n + 3];
         const takeOnlyFirstElementOfArray = (arr) => arr[0];
-        const filterOutOdds = (n) => n % 2 ? undefined : n;
+        const filterOutOdds = (n) => (n % 2 ? undefined : n);
         const numberToString = (n) => n.toString();
-        const add1Transform = (new simple_async_transform_1.SimpleAsyncTransform(add1, { objectMode: true }));
-        const create3ElementsFrom1Transform = (new simple_transform_1.SimpleTransform(create3ElementsFrom1, { objectMode: true }));
-        const takeOnlyFirstElementOfArrayTransform = (new simple_transform_1.SimpleTransform(takeOnlyFirstElementOfArray, { objectMode: true }));
+        const add1Transform = new simple_async_transform_1.SimpleAsyncTransform(add1, { objectMode: true });
+        const create3ElementsFrom1Transform = new simple_transform_1.SimpleTransform(create3ElementsFrom1, { objectMode: true });
+        const takeOnlyFirstElementOfArrayTransform = new simple_transform_1.SimpleTransform(takeOnlyFirstElementOfArray, {
+            objectMode: true,
+        });
         const filterOutOddsTranform = new simple_transform_1.SimpleTransform(filterOutOdds, { objectMode: true });
         const numberToStringTrasnform = new simple_transform_1.SimpleTransform(numberToString, { objectMode: true });
-        const streamPipe = stream_pipe_1.getStreamPipe(source, add1Transform, create3ElementsFrom1Transform, takeOnlyFirstElementOfArrayTransform, filterOutOddsTranform, numberToStringTrasnform);
+        const streamPipe = (0, stream_pipe_1.getStreamPipe)(source, add1Transform, create3ElementsFrom1Transform, takeOnlyFirstElementOfArrayTransform, filterOutOddsTranform, numberToStringTrasnform);
         const result = [];
         streamPipe.destination.on('data', (data) => result.push(data));
-        yield helpers_for_tests_1.streamEnd(streamPipe.destination);
+        yield (0, helpers_for_tests_1.streamEnd)(streamPipe.destination);
         expect(result).toEqual(['4', '6', '8', '10']);
     }));
     it('should pipe async transforms', () => __awaiter(void 0, void 0, void 0, function* () {
         const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]).pipe(new typed_pass_through_1.TypedPassThrough({ objectMode: true }));
         const add1 = (n) => __awaiter(void 0, void 0, void 0, function* () { return n + 1; });
         const create3ElementsFrom1 = (n) => __awaiter(void 0, void 0, void 0, function* () {
-            yield helpers_for_tests_1.sleep(100);
+            yield (0, helpers_for_tests_1.sleep)(100);
             return [n + 1, n + 2, n + 3];
         });
         const takeOnlyFirstElementOfArray = (arr) => arr[0];
-        const filterOutOdds = (n) => n % 2 ? undefined : n;
+        const filterOutOdds = (n) => (n % 2 ? undefined : n);
         const numberToString = (n) => n.toString();
-        const add1Transform = (new simple_async_transform_1.SimpleAsyncTransform(add1, { objectMode: true }));
-        const create3ElementsFrom1Transform = (new simple_async_transform_1.SimpleAsyncTransform(create3ElementsFrom1, { objectMode: true }));
-        const takeOnlyFirstElementOfArrayTransform = (new simple_transform_1.SimpleTransform(takeOnlyFirstElementOfArray, { objectMode: true }));
+        const add1Transform = new simple_async_transform_1.SimpleAsyncTransform(add1, { objectMode: true });
+        const create3ElementsFrom1Transform = new simple_async_transform_1.SimpleAsyncTransform(create3ElementsFrom1, { objectMode: true });
+        const takeOnlyFirstElementOfArrayTransform = new simple_transform_1.SimpleTransform(takeOnlyFirstElementOfArray, {
+            objectMode: true,
+        });
         const filterOutOddsTranform = new simple_transform_1.SimpleTransform(filterOutOdds, { objectMode: true });
         const numberToStringTrasnform = new simple_transform_1.SimpleTransform(numberToString, { objectMode: true });
-        const streamPipe = stream_pipe_1.getStreamPipe(a, add1Transform, create3ElementsFrom1Transform, takeOnlyFirstElementOfArrayTransform, filterOutOddsTranform, numberToStringTrasnform);
+        const streamPipe = (0, stream_pipe_1.getStreamPipe)(a, add1Transform, create3ElementsFrom1Transform, takeOnlyFirstElementOfArrayTransform, filterOutOddsTranform, numberToStringTrasnform);
         const result = [];
         streamPipe.on('data', (data) => result.push(data));
-        yield helpers_for_tests_1.streamEnd(streamPipe.destination);
+        yield (0, helpers_for_tests_1.streamEnd)(streamPipe.destination);
         expect(result).toEqual(['4', '6', '8', '10']);
     }));
     it('should promisify the end of stream correctly', () => __awaiter(void 0, void 0, void 0, function* () {
         const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]).pipe(new simple_transform_1.SimpleTransform((n) => n, { objectMode: true }));
         const add1 = (n) => __awaiter(void 0, void 0, void 0, function* () { return n + 1; });
         const create3ElementsFrom1 = (n) => __awaiter(void 0, void 0, void 0, function* () {
-            yield helpers_for_tests_1.sleep(100);
+            yield (0, helpers_for_tests_1.sleep)(100);
             return [n + 1, n + 2, n + 3];
         });
         const takeOnlyFirstElementOfArray = (arr) => arr[0];
-        const filterOutOdds = (n) => n % 2 ? undefined : n;
+        const filterOutOdds = (n) => (n % 2 ? undefined : n);
         const numberToString = (n) => n.toString();
-        const add1Transform = (new simple_async_transform_1.SimpleAsyncTransform(add1, { objectMode: true }));
-        const create3ElementsFrom1Transform = (new simple_async_transform_1.SimpleAsyncTransform(create3ElementsFrom1, { objectMode: true }));
-        const takeOnlyFirstElementOfArrayTransform = (new simple_transform_1.SimpleTransform(takeOnlyFirstElementOfArray, { objectMode: true }));
+        const add1Transform = new simple_async_transform_1.SimpleAsyncTransform(add1, { objectMode: true });
+        const create3ElementsFrom1Transform = new simple_async_transform_1.SimpleAsyncTransform(create3ElementsFrom1, { objectMode: true });
+        const takeOnlyFirstElementOfArrayTransform = new simple_transform_1.SimpleTransform(takeOnlyFirstElementOfArray, {
+            objectMode: true,
+        });
         const filterOutOddsTranform = new simple_transform_1.SimpleTransform(filterOutOdds, { objectMode: true });
         const numberToStringTrasnform = new simple_transform_1.SimpleTransform(numberToString, { objectMode: true });
-        const streamPipe = stream_pipe_1.getStreamPipe(a, add1Transform, create3ElementsFrom1Transform, takeOnlyFirstElementOfArrayTransform, filterOutOddsTranform, numberToStringTrasnform);
+        const streamPipe = (0, stream_pipe_1.getStreamPipe)(a, add1Transform, create3ElementsFrom1Transform, takeOnlyFirstElementOfArrayTransform, filterOutOddsTranform, numberToStringTrasnform);
         const result = [];
         streamPipe.on('data', (data) => result.push(data));
         yield streamPipe.promisifyEvents(['end']);
@@ -84,15 +90,17 @@ describe('Stream pipe', () => {
         const takeOnlyFirstElementOfArray = (arr) => __awaiter(void 0, void 0, void 0, function* () { return arr[0]; });
         const filterOutOdds = (n) => !(n % 2);
         const numberToString = (n) => n.toString();
-        const add1Transform = (transforms_helper_1.objectTransformsHelper.async.fromFunction(add1));
-        const create3ElementsFrom1Transform = (new simple_transform_1.SimpleTransform(create3ElementsFrom1, { objectMode: true }));
-        const takeOnlyFirstElementOfArrayTransform = (new simple_async_transform_1.SimpleAsyncTransform(takeOnlyFirstElementOfArray, { objectMode: true }));
+        const add1Transform = transforms_helper_1.objectTransformsHelper.async.fromFunction(add1);
+        const create3ElementsFrom1Transform = new simple_transform_1.SimpleTransform(create3ElementsFrom1, { objectMode: true });
+        const takeOnlyFirstElementOfArrayTransform = new simple_async_transform_1.SimpleAsyncTransform(takeOnlyFirstElementOfArray, {
+            objectMode: true,
+        });
         const filterOutOddsTranform = transforms_helper_1.objectTransformsHelper.filter(filterOutOdds);
         const numberToStringTrasnform = new simple_transform_1.SimpleTransform(numberToString, { objectMode: true });
-        const streamPipe = stream_pipe_1.getStreamPipe(source, add1Transform, create3ElementsFrom1Transform, takeOnlyFirstElementOfArrayTransform, filterOutOddsTranform, numberToStringTrasnform);
+        const streamPipe = (0, stream_pipe_1.getStreamPipe)(source, add1Transform, create3ElementsFrom1Transform, takeOnlyFirstElementOfArrayTransform, filterOutOddsTranform, numberToStringTrasnform);
         const result = [];
         streamPipe.destination.on('data', (data) => result.push(data));
-        yield helpers_for_tests_1.streamEnd(streamPipe.destination);
+        yield (0, helpers_for_tests_1.streamEnd)(streamPipe.destination);
         expect(result).toEqual(['4', '6', '8', '10']);
     }));
 });

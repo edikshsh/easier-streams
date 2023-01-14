@@ -21,12 +21,18 @@ class StreamPipe extends Emitter_1.TypedEventEmitter {
         this._destination.on('finish', () => this.emit('finish'));
         this._destination.on('data', (data) => this.emit('data', data));
         this._source.on('error', (error) => this.emit('error', error));
-        this._pipeline.forEach(transform => transform.on('error', (error) => this.emit('error', error)));
+        this._pipeline.forEach((transform) => transform.on('error', (error) => this.emit('error', error)));
         this._destination.on('error', (error) => this.emit('error', error));
     }
-    get source() { return this._source; }
-    get pipeline() { return [this._source, ...this._pipeline, this._destination]; }
-    get destination() { return this._destination; }
+    get source() {
+        return this._source;
+    }
+    get pipeline() {
+        return [this._source, ...this._pipeline, this._destination];
+    }
+    get destination() {
+        return this._destination;
+    }
     build() {
         [...this._pipeline, this.destination].reduce((lastTranform, newTransform) => {
             return lastTranform.pipe(newTransform);

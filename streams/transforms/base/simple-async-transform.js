@@ -16,6 +16,7 @@ exports.SimpleAsyncTransform = void 0;
 const lodash_clonedeep_1 = __importDefault(require("lodash.clonedeep"));
 const base_transform_1 = require("./base-transform");
 const stream_error_1 = require("../../errors/stream-error");
+const get_formatted_chunk_1 = require("../../utility/get-formatted-chunk");
 class SimpleAsyncTransform extends base_transform_1.BaseTransform {
     constructor(transformer, options) {
         super(options);
@@ -25,15 +26,16 @@ class SimpleAsyncTransform extends base_transform_1.BaseTransform {
     _transform(chunk, encoding, callback) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const chunkClone = lodash_clonedeep_1.default(chunk);
+            const chunkClone = (0, lodash_clonedeep_1.default)(chunk);
             try {
                 const result = yield this.transformer(chunk);
                 return callback(null, result);
             }
             catch (error) {
                 const finalError = error instanceof Error ? error : new Error(`${error}`);
+                const formattedChunk = (0, get_formatted_chunk_1.getFormattedChunk)(chunkClone, this.options);
                 if ((_a = this.options) === null || _a === void 0 ? void 0 : _a.errorStream) {
-                    const streamError = new stream_error_1.StreamError(finalError, chunkClone);
+                    const streamError = new stream_error_1.StreamError(finalError, formattedChunk);
                     return callback(null, streamError);
                 }
                 return callback(finalError);
@@ -42,4 +44,15 @@ class SimpleAsyncTransform extends base_transform_1.BaseTransform {
     }
 }
 exports.SimpleAsyncTransform = SimpleAsyncTransform;
+// function asdf<TDestination>(data: TDestination, error: Error, isPipedToErrorStream: boolean): {
+//     error: StreamError<TDestination> | Error | null,
+//     data: StreamError<TDestination> | null
+// } {
+//     const finalError = error instanceof Error ? error : new Error(`${error}`)
+//     if (isPipedToErrorStream) {
+//         const streamError = new StreamError(finalError, data);
+//         return { error: null, data: streamError }
+//     }
+//     return { error: finalError, data: null }
+// }
 //# sourceMappingURL=simple-async-transform.js.map

@@ -15,8 +15,8 @@ class EventPromisifier {
         return __awaiter(this, void 0, void 0, function* () {
             resolveEvents = typeof resolveEvents === 'string' ? [resolveEvents] : resolveEvents;
             rejectEvents = typeof rejectEvents === 'string' ? [rejectEvents] : rejectEvents;
-            resolveEvents = resolveEvents.filter(event => event);
-            rejectEvents = rejectEvents.filter(event => event);
+            resolveEvents = resolveEvents.filter((event) => event);
+            rejectEvents = rejectEvents.filter((event) => event);
             if (!(resolveEvents.length || rejectEvents.length)) {
                 return undefined;
             }
@@ -25,7 +25,7 @@ class EventPromisifier {
                 const functionsToTurnOff = [];
                 const wrapper = (eventString) => {
                     const eventListenerFunction = (data) => {
-                        functionsToTurnOff.forEach(item => emitter.off(item.event, item.func));
+                        functionsToTurnOff.forEach((item) => emitter.off(item.event, item.func));
                         if (resolveEvents.includes(eventString)) {
                             resolve(data);
                         }
@@ -36,7 +36,7 @@ class EventPromisifier {
                     functionsToTurnOff.push({ event: eventString, func: eventListenerFunction });
                     return eventListenerFunction;
                 };
-                allEvents.forEach(event => emitter.on(event, wrapper(event)));
+                allEvents.forEach((event) => emitter.on(event, wrapper(event)));
             });
         });
     }

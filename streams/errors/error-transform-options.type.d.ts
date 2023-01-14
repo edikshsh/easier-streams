@@ -1,4 +1,5 @@
-import { ErrorTransform } from "./error-transform";
-export declare type ErrorTransformOptions<TSource> = {
+import { ErrorTransform } from './error-transform';
+export type ErrorTransformOptions<TSource> = {
     errorStream?: ErrorTransform<TSource>;
+    chunkFormatter?: (chunk: TSource) => unknown;
 };

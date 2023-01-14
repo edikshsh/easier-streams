@@ -1,1 +1,1 @@
-{"version":3,"file":"is-stream-error.js","sourceRoot":"","sources":["../../../src/streams/errors/is-stream-error.ts"],"names":[],"mappings":";;;AAAA,iDAA6C;AAG7C,SAAgB,aAAa,CAAC,WAAoB;IAC9C,OAAO,WAAW,YAAY,0BAAW,CAAC;AAC9C,CAAC;AAFD,sCAEC"}
+{"version":3,"file":"is-stream-error.js","sourceRoot":"","sources":["../../../src/streams/errors/is-stream-error.ts"],"names":[],"mappings":";;;AAAA,iDAA6C;AAE7C,SAAgB,aAAa,CAAI,WAAoB;IACjD,OAAO,WAAW,YAAY,0BAAW,CAAC;AAC9C,CAAC;AAFD,sCAEC"}

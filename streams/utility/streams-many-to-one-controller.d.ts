@@ -1,3 +1,4 @@
 /// <reference types="node" />
-import EventEmitter from "events";
-export declare function streamsManyToOneController(inputLayer: EventEmitter[], output: EventEmitter, eventCounter?: Record<"end" | "finish" | "close", number>): void;
+import EventEmitter from 'events';
+import { StreamGroupControllerEventCounter } from './stream-group-output-controller-event-counter.type';
+export declare function streamsManyToOneController(inputLayer: EventEmitter[], output: EventEmitter, eventCounter?: StreamGroupControllerEventCounter): void;

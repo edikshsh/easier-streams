@@ -1,1 +1,1 @@
-export declare type TypedTransformCallback<TDestination> = (error?: Error | null, data?: TDestination) => void;
+export type TypedTransformCallback<TDestination> = (error?: Error | null, data?: TDestination) => void;

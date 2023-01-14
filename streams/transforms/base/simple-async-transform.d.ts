@@ -1,9 +1,9 @@
 /// <reference types="node" />
-import { FullTransformOptions } from "../types/full-transform-options.type";
-import { BaseTransform } from "./base-transform";
-import { TransformFunction } from "./simple-transform";
-import { TypedTransformCallback } from "../types/typed-transform-callback";
-export declare type AsyncTransformFunction<TSource, TDestination> = TransformFunction<TSource, Promise<TDestination>>;
+import { FullTransformOptions } from '../types/full-transform-options.type';
+import { BaseTransform } from './base-transform';
+import { TransformFunction } from './simple-transform';
+import { TypedTransformCallback } from '../types/typed-transform-callback';
+export type AsyncTransformFunction<TSource, TDestination> = TransformFunction<TSource, Promise<TDestination>>;
 export declare class SimpleAsyncTransform<TSource, TDestination> extends BaseTransform<TSource, TDestination> {
     private transformer;
     private options?;

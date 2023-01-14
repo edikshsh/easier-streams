@@ -26,7 +26,7 @@ describe('pipeHelper', () => {
     beforeEach(() => {
         sourceData = [1, 2, 3, 4, 5, 6, 7, 8];
         sourceTransform = transforms_helper_1.objectTransformsHelper.fromIterable(sourceData);
-        sourceTransforms = [0, 0].map((_, index) => transforms_helper_1.objectTransformsHelper.fromIterable([0, 1, 2, 3].map(a => a + (index * 4) + 1)));
+        sourceTransforms = [0, 0].map((_, index) => transforms_helper_1.objectTransformsHelper.fromIterable([0, 1, 2, 3].map((a) => a + index * 4 + 1)));
         destinationTransform = transforms_helper_1.objectTransformsHelper.passThrough();
         destinationTransforms = [0, 0].map(() => transforms_helper_1.objectTransformsHelper.passThrough());
     });
@@ -53,7 +53,10 @@ describe('pipeHelper', () => {
         it('should error correctly when not piped to error stream', () => __awaiter(void 0, void 0, void 0, function* () {
             const source = sourceTransform.pipe(transforms_helper_1.objectTransformsHelper.fromFunction(errorOnEvenFunc));
             pipe_helper_1.pipeHelper.pipeOneToOne(source, destinationTransform);
-            const promise = Promise.all([destinationTransform.promisifyEvents(['end'], ['error']), source.promisifyEvents([], ['error'])]);
+            const promise = Promise.all([
+                destinationTransform.promisifyEvents(['end'], ['error']),
+                source.promisifyEvents([], ['error']),
+            ]);
             yield expect(promise).rejects.toThrow(new Error('asdf'));
         }));
     });
@@ -61,8 +64,8 @@ describe('pipeHelper', () => {
         it('should pass data', () => __awaiter(void 0, void 0, void 0, function* () {
             pipe_helper_1.pipeHelper.pipeOneToMany(sourceTransform, destinationTransforms);
             const result = [];
-            destinationTransforms.forEach(dest => dest.on('data', (data) => result.push(data)));
-            yield Promise.all(destinationTransforms.map(dest => dest.promisifyEvents(['end'])));
+            destinationTransforms.forEach((dest) => dest.on('data', (data) => result.push(data)));
+            yield Promise.all(destinationTransforms.map((dest) => dest.promisifyEvents(['end'])));
             const expectedResults = [...sourceData, ...sourceData].sort((a, b) => a - b);
             expect(result).toEqual(expectedResults);
         }));
@@ -72,9 +75,12 @@ describe('pipeHelper', () => {
             pipe_helper_1.pipeHelper.pipeOneToMany(source, destinationTransforms, { errorStream });
             const result = [];
             const errors = [];
-            destinationTransforms.forEach(dest => dest.on('data', (data) => result.push(data)));
+            destinationTransforms.forEach((dest) => dest.on('data', (data) => result.push(data)));
             errorStream.on('data', (error) => errors.push(error.data));
-            yield Promise.all([...destinationTransforms.map(dest => dest.promisifyEvents(['end'])), errorStream.promisifyEvents(['end'])]);
+            yield Promise.all([
+                ...destinationTransforms.map((dest) => dest.promisifyEvents(['end'])),
+                errorStream.promisifyEvents(['end']),
+            ]);
             const expectedResult = [1, 1, 3, 3, 5, 5, 7, 7];
             expect(result).toEqual(expectedResult);
             expect(errors).toEqual([2, 4, 6, 8]);
@@ -97,7 +103,10 @@ describe('pipeHelper', () => {
             const errors = [];
             destinationTransform.on('data', (data) => result.push(data));
             errorStream.on('data', (error) => errors.push(error.data));
-            yield Promise.all([sources.map(source => source.promisifyEvents(['end'])), errorStream.promisifyEvents(['end'])]);
+            yield Promise.all([
+                sources.map((source) => source.promisifyEvents(['end'])),
+                errorStream.promisifyEvents(['end']),
+            ]);
             expect(result).toEqual([1, 3, 5, 7]);
             expect(errors).toEqual([2, 4, 6, 8]);
         }));
@@ -105,7 +114,10 @@ describe('pipeHelper', () => {
             const sources = sourceTransforms.map((sourceTransform) => sourceTransform.pipe(transforms_helper_1.objectTransformsHelper.fromFunction(errorOnEvenFunc)));
             pipe_helper_1.pipeHelper.pipeManyToOne(sources, destinationTransform);
             destinationTransform.on('data', () => undefined);
-            const promise = Promise.all([destinationTransform.promisifyEvents(['end']), ...sources.map(source => source.promisifyEvents([], ['error']))]);
+            const promise = Promise.all([
+                destinationTransform.promisifyEvents(['end']),
+                ...sources.map((source) => source.promisifyEvents([], ['error'])),
+            ]);
             yield expect(promise).rejects.toThrow(new Error('asdf'));
         }));
     });
@@ -113,8 +125,8 @@ describe('pipeHelper', () => {
         it('should pass data', () => __awaiter(void 0, void 0, void 0, function* () {
             pipe_helper_1.pipeHelper.pipeManyToMany(sourceTransforms, destinationTransforms);
             const result = [];
-            destinationTransforms.forEach(dest => dest.on('data', (data) => result.push(data)));
-            yield Promise.all(destinationTransforms.map(dest => dest.promisifyEvents(['end'])));
+            destinationTransforms.forEach((dest) => dest.on('data', (data) => result.push(data)));
+            yield Promise.all(destinationTransforms.map((dest) => dest.promisifyEvents(['end'])));
             const sortedResult = result.sort((a, b) => a - b);
             expect(sortedResult).toEqual(sourceData);
         }));
@@ -124,9 +136,12 @@ describe('pipeHelper', () => {
             pipe_helper_1.pipeHelper.pipeManyToMany(sources, destinationTransforms, { errorStream });
             const result = [];
             const errors = [];
-            destinationTransforms.forEach(destinationTransform => destinationTransform.on('data', (data) => result.push(data)));
+            destinationTransforms.forEach((destinationTransform) => destinationTransform.on('data', (data) => result.push(data)));
             errorStream.on('data', (error) => errors.push(error.data));
-            yield Promise.all([sources.map(source => source.promisifyEvents(['end'])), errorStream.promisifyEvents(['end'])]);
+            yield Promise.all([
+                sources.map((source) => source.promisifyEvents(['end'])),
+                errorStream.promisifyEvents(['end']),
+            ]);
             expect(result).toEqual([1, 3, 5, 7]);
             expect(errors).toEqual([2, 4, 6, 8]);
         }));
@@ -188,7 +203,11 @@ describe('pipeHelper', () => {
         const errors = [];
         layer5.on('data', (data) => result.push(data));
         errorStream.on('data', (error) => errors.push(error.data));
-        const promise = Promise.all([layer5.promisifyEvents(['end']), errorStream.promisifyEvents(['end']), ...layer3_failing.map(transform => transform.promisifyEvents(['end'], ['error']))]);
+        const promise = Promise.all([
+            layer5.promisifyEvents(['end']),
+            errorStream.promisifyEvents(['end']),
+            ...layer3_failing.map((transform) => transform.promisifyEvents(['end'], ['error'])),
+        ]);
         yield expect(promise).rejects.toThrow(Error('layer3'));
         expect(result).toEqual([4, 4]);
         expect(errors).toEqual([1, 2, 2, 3, 3]);

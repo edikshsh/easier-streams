@@ -1,9 +1,9 @@
 /// <reference types="node" />
-import { TypedTransform } from "../typed-transform/typed-transform.interface";
-import { FullTransformOptions } from "../types/full-transform-options.type";
-import { TypedTransformCallback } from "../types/typed-transform-callback";
-import { BaseTransform } from "./base-transform";
-export declare type TransformFunction<TSource, TDestination> = (item: TSource) => TDestination;
+import { TypedTransform } from '../typed-transform/typed-transform.interface';
+import { FullTransformOptions } from '../types/full-transform-options.type';
+import { TypedTransformCallback } from '../types/typed-transform-callback';
+import { BaseTransform } from './base-transform';
+export type TransformFunction<TSource, TDestination> = (item: TSource) => TDestination;
 export declare class SimpleTransform<TSource, TDestination> extends BaseTransform<TSource, TDestination> implements TypedTransform<TSource, TDestination> {
     private transformer;
     private options?;
