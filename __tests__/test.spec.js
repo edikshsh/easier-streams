@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const stream_1 = require("stream");
 const stream_error_1 = require("../streams/errors/stream-error");
-const transforms_helper_1 = require("../streams/transforms-helper");
+const transformer_1 = require("../streams/transformer");
 const simple_async_transform_1 = require("../streams/transforms/base/simple-async-transform");
 const simple_transform_1 = require("../streams/transforms/base/simple-transform");
 const array_join_transform_1 = require("../streams/transforms/utility/array-join-transform");
@@ -86,7 +86,7 @@ describe('Test transforms', () => {
         }));
         it('formats chunk on errors', () => __awaiter(void 0, void 0, void 0, function* () {
             const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
-            const errorStream = transforms_helper_1.objectTransformsHelper.errorTransform(); // Just for passing errors, will not get them
+            const errorStream = transformer_1.transformer.errorTransform(); // Just for passing errors, will not get them
             const chunkFormatter = (chunk) => ({ num: chunk });
             const throwingTransform = new simple_transform_1.SimpleTransform(errorOnInput(4, 'asdf'), {
                 objectMode: true,
@@ -150,7 +150,7 @@ describe('Test transforms', () => {
         }));
         it('formats chunk on errors', () => __awaiter(void 0, void 0, void 0, function* () {
             const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
-            const errorStream = transforms_helper_1.objectTransformsHelper.errorTransform(); // Just for passing errors, will not get them
+            const errorStream = transformer_1.transformer.errorTransform(); // Just for passing errors, will not get them
             const chunkFormatter = (chunk) => ({ num: chunk });
             const throwingTransform = new simple_async_transform_1.SimpleAsyncTransform(errorOnInput(4, 'asdf'), {
                 objectMode: true,

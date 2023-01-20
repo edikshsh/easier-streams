@@ -36,7 +36,7 @@ type TypedTransformPipe_12<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> = 
     ...TypedTransformPipe_11<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>,
     PipableTransformGroup<T11, T12>
 ];
-declare class PipeHelper {
+declare class Plumber {
     pipe<T1, T2, T3>(options: ErrorTransformOptions<T1>, ...transformGroups: TypedTransformPipe_03<T1, T2, T3>): void;
     pipe<T1, T2, T3, T4>(options: ErrorTransformOptions<T1>, ...transformGroups: TypedTransformPipe_04<T1, T2, T3, T4>): void;
     pipe<T1, T2, T3, T4, T5>(options: ErrorTransformOptions<T1>, ...transformGroups: TypedTransformPipe_05<T1, T2, T3, T4, T5>): void;
@@ -69,5 +69,5 @@ declare class PipeHelper {
     private pipingFunctionLegacy;
     private pipingFunctionNew;
 }
-export declare const pipeHelper: PipeHelper;
+export declare const plumber: Plumber;
 export {};

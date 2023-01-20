@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.pipeHelper = void 0;
+exports.plumber = void 0;
 const stream_1 = require("stream");
 const streams_many_to_one_controller_1 = require("./utility/streams-many-to-one-controller");
-const transforms_helper_1 = require("./transforms-helper");
 const filter_out_stream_error_1 = require("./errors/filter-out-stream-error");
+const transformer_1 = require("./transformer");
 function noop(...args) {
     return undefined;
 }
-class PipeHelper {
+class Plumber {
     // pipe<T1, T2, T3 extends T2, T4>(options: ErrorTransformOptions<T1>, ...transformGroups: TypedTransformPipe_v2_03<T1, T2, T3, T4>): void
     // pipe<T1, T2, T3 extends T2, T4, T5 extends T4, T6>(options: ErrorTransformOptions<T1>, ...transformGroups: TypedTransformPipe_v2_04<T1, T2, T3, T4, T5, T6>): void
     // pipe<T1, T2, T3 extends T2, T4, T5 extends T4, T6, T7 extends T6, T8>(options: ErrorTransformOptions<T1>, ...transformGroups: TypedTransformPipe_v2_05<T1, T2, T3, T4, T5, T6, T7, T8>): void
@@ -113,7 +113,7 @@ class PipeHelper {
     pipeData(sources, destination) {
         // sources.forEach(source => source.pipe(objectTransformsHelper.filter(filterOutStreamError())).pipe(destination));
         sources.forEach((source) => {
-            const errorFilter = transforms_helper_1.objectTransformsHelper.filter((0, filter_out_stream_error_1.filterOutStreamError)()); //TODO: fix type
+            const errorFilter = transformer_1.transformer.filter((0, filter_out_stream_error_1.filterOutStreamError)()); //TODO: fix type
             this.pipingFunctionLegacy(source, errorFilter);
             this.pipingFunctionLegacy(errorFilter, destination);
         });
@@ -130,5 +130,5 @@ class PipeHelper {
         return (0, stream_1.pipeline)(source, destination, noop);
     }
 }
-exports.pipeHelper = new PipeHelper();
-//# sourceMappingURL=pipe-helper.js.map
+exports.plumber = new Plumber();
+//# sourceMappingURL=plumber.js.map

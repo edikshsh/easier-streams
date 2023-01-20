@@ -15,7 +15,7 @@ const simple_transform_1 = require("../streams/transforms/base/simple-transform"
 const stream_pipe_1 = require("../streams/stream-pipe");
 const helpers_for_tests_1 = require("./helpers-for-tests");
 const typed_pass_through_1 = require("../streams/transforms/utility/typed-pass-through");
-const transforms_helper_1 = require("../streams/transforms-helper");
+const transformer_1 = require("../streams/transformer");
 describe('Stream pipe', () => {
     it('should pipe transforms', () => __awaiter(void 0, void 0, void 0, function* () {
         const source = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]).pipe(new typed_pass_through_1.TypedPassThrough({ objectMode: true }));
@@ -90,12 +90,12 @@ describe('Stream pipe', () => {
         const takeOnlyFirstElementOfArray = (arr) => __awaiter(void 0, void 0, void 0, function* () { return arr[0]; });
         const filterOutOdds = (n) => !(n % 2);
         const numberToString = (n) => n.toString();
-        const add1Transform = transforms_helper_1.objectTransformsHelper.async.fromFunction(add1);
+        const add1Transform = transformer_1.transformer.async.fromFunction(add1);
         const create3ElementsFrom1Transform = new simple_transform_1.SimpleTransform(create3ElementsFrom1, { objectMode: true });
         const takeOnlyFirstElementOfArrayTransform = new simple_async_transform_1.SimpleAsyncTransform(takeOnlyFirstElementOfArray, {
             objectMode: true,
         });
-        const filterOutOddsTranform = transforms_helper_1.objectTransformsHelper.filter(filterOutOdds);
+        const filterOutOddsTranform = transformer_1.transformer.filter(filterOutOdds);
         const numberToStringTrasnform = new simple_transform_1.SimpleTransform(numberToString, { objectMode: true });
         const streamPipe = (0, stream_pipe_1.getStreamPipe)(source, add1Transform, create3ElementsFrom1Transform, takeOnlyFirstElementOfArrayTransform, filterOutOddsTranform, numberToStringTrasnform);
         const result = [];

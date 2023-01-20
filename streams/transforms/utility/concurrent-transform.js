@@ -81,7 +81,7 @@ class ConcurrentTransform extends base_transform_1.BaseTransform {
                 const finalError = error instanceof Error ? error : new Error(`${error}`);
                 const formattedChunk = (0, get_formatted_chunk_1.getFormattedChunk)(chunkClone, this.options);
                 if ((_a = this.options) === null || _a === void 0 ? void 0 : _a.errorStream) {
-                    const streamError = new stream_error_1.StreamError(finalError, chunkClone);
+                    const streamError = new stream_error_1.StreamError(finalError, formattedChunk);
                     this.push(streamError);
                 }
                 else {

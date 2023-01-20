@@ -61,7 +61,7 @@ All transforms from this package implement typed event emitter
 
   
 
-### TransformsHelper
+### Transformer
 
 Pass to it some default transform options, and it will create transforms using this options as default
 Some of the transforms also have an async version, you can access then through the async property
@@ -90,11 +90,9 @@ Some of the transforms also have an async version, you can access then through t
 -  **fromFunctionConcurrent** - A special async only transform. Takes an async function and runs it concurrently on the input
 
 
-You can initialize a new TransformsHelper or use one of the premade: 
+You can initialize a new Transformer or use the premade: 
 
-- **transformsHelper** - with no default options 
-
-- **objectTransformsHelper** - with objectMode set to true
+- **transformer** - with objectMode set to true
 
   
 
@@ -103,7 +101,7 @@ You can initialize a new TransformsHelper or use one of the premade:
 Pipe those typed transforms in a type safe(ish) way
 
 
-### Pipe helper
+### Plumber
 Make complex pipes easier, and handle passing errors to error streams.
 Pipe transforms one -> one (like regular piping), one -> many, many -> one and many -> many.
 If an error stream is passed, pipe all transforms while passing errors to the error stream, and data to the next stream.
@@ -115,14 +113,14 @@ If an error stream is passed, pipe all transforms while passing errors to the er
 If the stream should be unpiped in any point, try piping the source of the pipe connection to a passThrough without passing an error stream, then pipe that passThrough to the destination.
 ```
 
-const source = objectTransformsHelper.fromIterable([1,2,3,4,5,6]);
-const passThroughForUnpiping = objectTransformsHelper.passThrough<number>();
+const source = transformer.fromIterable([1,2,3,4,5,6]);
+const passThroughForUnpiping = transformer.passThrough<number>();
 source.pipe(passThroughForUnpiping);
 
-const manyPassThroughs = [1,2,3].map(() => objectTransformsHelper.passThrough<number>());
-const destination = objectTransformsHelper.passThrough<number>(); 
+const manyPassThroughs = [1,2,3].map(() => transformer.passThrough<number>());
+const destination = transformer.passThrough<number>(); 
 
-pipeHelper.pipe({}, passThroughForUnpiping, manyPassThroughs, destination);
+plumber.pipe({}, passThroughForUnpiping, manyPassThroughs, destination);
 
 //sometime later
 source.unpipe(passThroughForUnpiping);
@@ -132,8 +130,8 @@ source.unpipe(passThroughForUnpiping);
 And now, a demonstration:
 ```
 
-const source = objectTransformsHelper.fromIterable([1, 2, 3, 4, 5, 6, 7, 8]);
-const errorStream = objectTransformsHelper.errorTransform<number>();
+const source = transformer.fromIterable([1, 2, 3, 4, 5, 6, 7, 8]);
+const errorStream = transformer.errorTransform<number>();
 const add1  =  async (n:  number) => n +  1;
 const create3ElementsFrom1  = (n:  number) => [n +  1, n +  2, n +  3];
 const errorOnNumber4  = (n:  number) => {
@@ -145,14 +143,14 @@ const errorOnNumber4  = (n:  number) => {
 const  filterOutOdds  = (n:  number) =>  !(n %  2);
 const  numberToString  = (n:  number) => n.toString();
 
-const add1Transform = (objectTransformsHelper.async.fromFunction(add1));
-const create3ElementsFrom1Transform = objectTransformsHelper.fromFunction(create3ElementsFrom1);
-const takeOnlyFirstElementOfArrayTransform = objectTransformsHelper.pickElementFromArray(0);
-const errorOnNumber4Transform = objectTransformsHelper.fromFunction(errorOnNumber4, { errorStream });
-const filterOutOddsTranform = objectTransformsHelper.filter(filterOutOdds);
+const add1Transform = (transformer.async.fromFunction(add1));
+const create3ElementsFrom1Transform = transformer.fromFunction(create3ElementsFrom1);
+const takeOnlyFirstElementOfArrayTransform = transformer.pickElementFromArray(0);
+const errorOnNumber4Transform = transformer.fromFunction(errorOnNumber4, { errorStream });
+const filterOutOddsTranform = transformer.filter(filterOutOdds);
 const numberToStringTrasnform =  new  SimpleTransform(numberToString, { objectMode: true });
 
-pipeHelper.pipe(
+plumber.pipe(
 	{errorStream},
 	source,
 	add1Transform,
