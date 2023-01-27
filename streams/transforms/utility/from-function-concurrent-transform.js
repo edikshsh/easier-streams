@@ -7,14 +7,13 @@ const concurrent_transform_1 = require("./concurrent-transform");
 const from_function_transforms_1 = require("./from-function-transforms");
 const pick_element_from_array_transform_1 = require("./pick-element-from-array-transform");
 const typed_pass_through_1 = require("./typed-pass-through");
-function fromFunctionConcurrentTransform(transformer, concurrency, options = {}) {
-    const input = new typed_pass_through_1.TypedPassThrough(options);
-    const toArray = new array_join_transform_1.ArrayJoinTransform(concurrency, options);
-    const pickFromArrayLayer = [...Array(concurrency).keys()].map((a) => (0, pick_element_from_array_transform_1.pickElementFromArrayTransform)(a, options));
-    const actionLayer = [...Array(concurrency).keys()].map(() => (0, from_function_transforms_1.fromAsyncFunctionTransform)(transformer, options));
-    const output = new typed_pass_through_1.TypedPassThrough(options);
-    actionLayer.forEach((action) => action.on('error', (error) => output.emit('error', error)));
-    plumber_1.plumber.pipe(options, input, toArray, pickFromArrayLayer, actionLayer, output);
+function fromFunctionConcurrentTransform(transformFunction, concurrency, transformOptions = {}, plumberOptions = {}) {
+    const input = new typed_pass_through_1.TypedPassThrough(transformOptions);
+    const toArray = new array_join_transform_1.ArrayJoinTransform(concurrency, transformOptions);
+    const pickFromArrayLayer = [...Array(concurrency).keys()].map((a) => (0, pick_element_from_array_transform_1.pickElementFromArrayTransform)(a, transformOptions));
+    const actionLayer = [...Array(concurrency).keys()].map(() => (0, from_function_transforms_1.fromAsyncFunctionTransform)(transformFunction, transformOptions));
+    const output = new typed_pass_through_1.TypedPassThrough(transformOptions);
+    plumber_1.plumber.pipe(Object.assign({}, plumberOptions), input, toArray, pickFromArrayLayer, actionLayer, output);
     return { input, output };
 }
 exports.fromFunctionConcurrentTransform = fromFunctionConcurrentTransform;

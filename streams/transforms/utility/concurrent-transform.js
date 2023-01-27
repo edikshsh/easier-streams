@@ -12,8 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConcurrentTransform = void 0;
 const lodash_1 = require("lodash");
 const stream_1 = require("stream");
-const stream_error_1 = require("../../errors/stream-error");
-const get_formatted_chunk_1 = require("../../utility/get-formatted-chunk");
+const on_transform_error_1 = require("../../utility/on-transform-error");
 const base_transform_1 = require("../base/base-transform");
 function isTruthy(item) {
     return item !== undefined && item !== null;
@@ -32,16 +31,16 @@ class ConcurrentTransform extends base_transform_1.BaseTransform {
     }
     inputQueueIsEmpty() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.itemQueue.length === 0
-                ? yield Promise.resolve()
-                : yield new Promise((res) => this.ee.once('itemQueueEmpty', res));
+            return this.itemQueue.length === 0
+                ? Promise.resolve()
+                : new Promise((res) => this.ee.once('itemQueueEmpty', res));
         });
     }
     allWorkersFinished() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.liveWorkers === 0
-                ? yield Promise.resolve()
-                : yield new Promise((res) => this.ee.once('promiseQueueEmpty', res));
+            return this.liveWorkers === 0
+                ? Promise.resolve()
+                : new Promise((res) => this.ee.once('promiseQueueEmpty', res));
         });
     }
     startWorker() {
@@ -66,7 +65,6 @@ class ConcurrentTransform extends base_transform_1.BaseTransform {
         return item;
     }
     worker() {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const item = this.getItemFromQueue();
             if (!isTruthy(item)) {
@@ -78,15 +76,7 @@ class ConcurrentTransform extends base_transform_1.BaseTransform {
                 return true;
             }
             catch (error) {
-                const finalError = error instanceof Error ? error : new Error(`${error}`);
-                const formattedChunk = (0, get_formatted_chunk_1.getFormattedChunk)(chunkClone, this.options);
-                if ((_a = this.options) === null || _a === void 0 ? void 0 : _a.errorStream) {
-                    const streamError = new stream_error_1.StreamError(finalError, formattedChunk);
-                    this.push(streamError);
-                }
-                else {
-                    this.destroy(finalError);
-                }
+                this.onWorkerError(error, chunkClone);
             }
             finally {
                 this.itemsDone++;
@@ -94,14 +84,22 @@ class ConcurrentTransform extends base_transform_1.BaseTransform {
             return true;
         });
     }
+    onWorkerError(error, chunk) {
+        const callback = (error, chunk) => {
+            if (error) {
+                return this.destroy(error);
+            }
+            this.push(chunk);
+        };
+        return (0, on_transform_error_1.onTransformError)(this, error, chunk, callback, this.options);
+    }
     enqueueItems(items) {
         return __awaiter(this, void 0, void 0, function* () {
             items.forEach((item) => {
                 this.itemQueue.push(item);
                 void this.startWorker();
             });
-            const a = yield this.inputQueueIsEmpty();
-            return a;
+            return this.inputQueueIsEmpty();
         });
     }
     _transform(item, encoding, callback) {

@@ -1,5 +1,5 @@
-import { ErrorTransform } from './error-transform';
 export type ErrorTransformOptions<TSource> = {
-    errorStream?: ErrorTransform<TSource>;
+    shouldPushErrorsForward?: boolean;
     chunkFormatter?: (chunk: TSource) => unknown;
+    ignoreErrors?: boolean;
 };

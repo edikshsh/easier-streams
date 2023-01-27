@@ -48,7 +48,7 @@ class Transformer extends TransformerBase {
         const finalOptions = this.mergeOptions(options);
         return new array_split_transform_1.ArraySplitTransform(finalOptions);
     }
-    callOnDataSync(functionToCallOnData, options) {
+    callOnData(functionToCallOnData, options) {
         const finalOptions = this.mergeOptions(options);
         return (0, call_on_data_transforms_1.callOnDataSyncTransform)(functionToCallOnData, finalOptions);
     }
@@ -113,9 +113,9 @@ class AsyncTransformer extends TransformerBase {
         const finalOptions = this.mergeOptions(options);
         return (0, from_function_transforms_1.fromAsyncFunctionTransform)(transformer, finalOptions);
     }
-    fromFunctionConcurrent(transformer, concurrency, options) {
+    fromFunctionConcurrent(transformer, concurrency, options, plumberOptions) {
         const finalOptions = this.mergeOptions(options);
-        return (0, from_function_concurrent_transform_1.fromFunctionConcurrentTransform)(transformer, concurrency, finalOptions);
+        return (0, from_function_concurrent_transform_1.fromFunctionConcurrentTransform)(transformer, concurrency, finalOptions, plumberOptions);
     }
     fromFunctionConcurrent2(transformer, concurrency, options) {
         const finalOptions = this.mergeOptions(options);

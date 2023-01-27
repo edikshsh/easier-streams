@@ -8,7 +8,7 @@ import { TypedTransformCallback } from '../transforms/types/typed-transform-call
 import { StreamGroupControllerEventCounter } from '../utility/stream-group-output-controller-event-counter.type';
 import { StreamError } from './stream-error';
 export declare class ErrorTransform<TSource> extends BaseTransform<unknown, StreamError<TSource>> implements TypedTransform<unknown, StreamError<TSource>> {
-    streamGroupControllerEventCounter: StreamGroupControllerEventCounter;
+    streamGroupControllerEventCounter: Partial<StreamGroupControllerEventCounter>;
     totalInputs: number;
     constructor(options?: TransformOptions);
     _transform(chunk: unknown, encoding: BufferEncoding, callback: TypedTransformCallback<StreamError<TSource>>): void;

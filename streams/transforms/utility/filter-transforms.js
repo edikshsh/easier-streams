@@ -19,14 +19,6 @@ function filterTransform(filterFunction, options) {
         }
         catch (error) {
             onFilterError(error, options === null || options === void 0 ? void 0 : options.considerErrorAsFilterOut);
-            // if(options?.considerErrorAsFilterOut){
-            //     return undefined
-            // }
-            // if (options?.errorStream) {
-            //     throw error;
-            // }
-            // return undefined;
-            // throw error;
         }
     };
     return new simple_transform_1.SimpleTransform(filter, options);
@@ -39,10 +31,6 @@ function asyncFilterTransform(filterFunction, options) {
         }
         catch (error) {
             onFilterError(error, options === null || options === void 0 ? void 0 : options.considerErrorAsFilterOut);
-            // if (options?.errorStream) {
-            //     throw error;
-            // }
-            // return undefined;
         }
     });
     return new simple_async_transform_1.SimpleAsyncTransform(filter, options);
@@ -52,10 +40,6 @@ function onFilterError(error, considerErrorAsFilterOut) {
     if (considerErrorAsFilterOut) {
         return undefined;
     }
-    // if (options?.errorStream) {
-    //     throw error;
-    // }
-    // return undefined;
     throw error;
 }
 //# sourceMappingURL=filter-transforms.js.map

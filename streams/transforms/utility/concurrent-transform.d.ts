@@ -20,6 +20,7 @@ export declare class ConcurrentTransform<TSource, TDestination> extends BaseTran
     startWorker(): Promise<void>;
     getItemFromQueue(): TSource | undefined;
     worker(): Promise<boolean>;
+    onWorkerError(error: unknown, chunk: TSource): void;
     enqueueItems(items: TSource[]): Promise<void>;
     _transform(item: TSource, encoding: BufferEncoding, callback: TypedTransformCallback<TDestination>): Promise<void>;
     _destroy(error: Error | null, callback: (error: Error | null) => void): Promise<void>;

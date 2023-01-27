@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StreamError = exports.ErrorTransform = exports.voidInputTransform = exports.TypedEventEmitter = exports.TypedPassThrough = exports.pickElementFromArrayTransform = exports.fromIterable = exports.fromAsyncFunctionTransform = exports.fromFunctionTransform = exports.fromFunctionConcurrentTransform = exports.typeFilterTransform = exports.asyncFilterTransform = exports.filterTransform = exports.callOnDataAsyncTransform = exports.callOnDataSyncTransform = exports.ArraySplitTransform = exports.ArrayJoinTransform = exports.BaseTransform = exports.SimpleAsyncTransform = exports.SimpleTransform = exports.StreamPipe = exports.plumber = exports.Transformer = exports.transformer = void 0;
+exports.StreamError = exports.ErrorTransform = exports.voidInputTransform = exports.TypedEventEmitter = exports.TypedPassThrough = exports.pickElementFromArrayTransform = exports.fromIterable = exports.fromAsyncFunctionTransform = exports.fromFunctionTransform = exports.fromFunctionConcurrentTransform = exports.typeFilterTransform = exports.asyncFilterTransform = exports.filterTransform = exports.callOnDataAsyncTransform = exports.callOnDataSyncTransform = exports.ArraySplitTransform = exports.ArrayJoinTransform = exports.BaseTransform = exports.SimpleAsyncTransform = exports.SimpleTransform = exports.StreamPipe = exports.Plumber = exports.plumber = exports.Transformer = exports.transformer = void 0;
 const transformer_1 = require("./streams/transformer");
 Object.defineProperty(exports, "Transformer", { enumerable: true, get: function () { return transformer_1.Transformer; } });
 Object.defineProperty(exports, "transformer", { enumerable: true, get: function () { return transformer_1.transformer; } });
@@ -11,6 +11,7 @@ Object.defineProperty(exports, "SimpleTransform", { enumerable: true, get: funct
 const stream_pipe_1 = require("./streams/stream-pipe");
 const plumber_1 = require("./streams/plumber");
 Object.defineProperty(exports, "plumber", { enumerable: true, get: function () { return plumber_1.plumber; } });
+Object.defineProperty(exports, "Plumber", { enumerable: true, get: function () { return plumber_1.Plumber; } });
 const base_transform_1 = require("./streams/transforms/base/base-transform");
 Object.defineProperty(exports, "BaseTransform", { enumerable: true, get: function () { return base_transform_1.BaseTransform; } });
 const array_join_transform_1 = require("./streams/transforms/utility/array-join-transform");

@@ -4,7 +4,7 @@ exports.getStreamPipe = void 0;
 const Emitter_1 = require("../emitters/Emitter");
 /**
  * Deprecated
- * Use pipeHelper
+ * Use Plumber
  */
 class StreamPipe extends Emitter_1.TypedEventEmitter {
     constructor(_source, _pipeline, _destination) {

@@ -54,12 +54,6 @@ describe('Test transforms', () => {
         }));
     });
     describe('SimpleTransform', () => {
-        const errorOnInput = (input, error = 'asdf') => (n) => {
-            if (input === n) {
-                throw new Error(error);
-            }
-            return n;
-        };
         it('creates a typed transform from function', () => __awaiter(void 0, void 0, void 0, function* () {
             const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
             const add1 = (n) => n + 1;
@@ -88,25 +82,45 @@ describe('Test transforms', () => {
             const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
             const errorStream = transformer_1.transformer.errorTransform(); // Just for passing errors, will not get them
             const chunkFormatter = (chunk) => ({ num: chunk });
-            const throwingTransform = new simple_transform_1.SimpleTransform(errorOnInput(4, 'asdf'), {
+            const throwingTransform = new simple_transform_1.SimpleTransform((0, helpers_for_tests_1.getFailOnNumberFunction)(4), {
                 objectMode: true,
-                errorStream,
+                shouldPushErrorsForward: true,
                 chunkFormatter,
             });
             const result = [];
             throwingTransform.on('data', (data) => result.push(data));
             a.pipe(throwingTransform);
             yield (0, helpers_for_tests_1.streamEnd)(throwingTransform);
-            expect(result).toStrictEqual([1, 2, 3, new stream_error_1.StreamError(Error('asdf'), { num: 4 }), 5, 6, 7, 8]);
+            expect(result).toStrictEqual([1, 2, 3, new stream_error_1.StreamError(Error(helpers_for_tests_1.DEFAULT_ERROR_TEXT), { num: 4 }), 5, 6, 7, 8]);
+        }));
+        it('Ignores errors given ignoreErrors true', () => __awaiter(void 0, void 0, void 0, function* () {
+            const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
+            const throwingTransform = new simple_transform_1.SimpleTransform((0, helpers_for_tests_1.getFailOnNumberFunction)(4), {
+                objectMode: true,
+                ignoreErrors: true,
+            });
+            const result = [];
+            throwingTransform.on('data', (data) => result.push(data));
+            a.pipe(throwingTransform);
+            yield (0, helpers_for_tests_1.streamEnd)(throwingTransform);
+            expect(result).toStrictEqual([1, 2, 3, 5, 6, 7, 8]);
+        }));
+        it('Ignores errors given ignoreErrors true even when passing error stream', () => __awaiter(void 0, void 0, void 0, function* () {
+            const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
+            const errorStream = transformer_1.transformer.errorTransform(); // Just for passing errors, will not get them
+            const throwingTransform = new simple_transform_1.SimpleTransform((0, helpers_for_tests_1.getFailOnNumberFunction)(4), {
+                objectMode: true,
+                ignoreErrors: true,
+                shouldPushErrorsForward: true,
+            });
+            const result = [];
+            throwingTransform.on('data', (data) => result.push(data));
+            a.pipe(throwingTransform);
+            yield (0, helpers_for_tests_1.streamEnd)(throwingTransform);
+            expect(result).toStrictEqual([1, 2, 3, 5, 6, 7, 8]);
         }));
     });
     describe('SimpleAsyncTransform', () => {
-        const errorOnInput = (input, error = 'asdf') => (n) => __awaiter(void 0, void 0, void 0, function* () {
-            if (input === n) {
-                throw new Error(error);
-            }
-            return n;
-        });
         it('creates a typed transform from function', () => __awaiter(void 0, void 0, void 0, function* () {
             const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
             const add1 = (n) => __awaiter(void 0, void 0, void 0, function* () { return n + 1; });
@@ -152,28 +166,54 @@ describe('Test transforms', () => {
             const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
             const errorStream = transformer_1.transformer.errorTransform(); // Just for passing errors, will not get them
             const chunkFormatter = (chunk) => ({ num: chunk });
-            const throwingTransform = new simple_async_transform_1.SimpleAsyncTransform(errorOnInput(4, 'asdf'), {
+            const throwingTransform = new simple_async_transform_1.SimpleAsyncTransform((0, helpers_for_tests_1.getFailOnNumberAsyncFunction)(4), {
                 objectMode: true,
-                errorStream,
+                shouldPushErrorsForward: true,
                 chunkFormatter,
             });
             const result = [];
             throwingTransform.on('data', (data) => result.push(data));
             a.pipe(throwingTransform);
             yield (0, helpers_for_tests_1.streamEnd)(throwingTransform);
-            expect(result).toStrictEqual([1, 2, 3, new stream_error_1.StreamError(Error('asdf'), { num: 4 }), 5, 6, 7, 8]);
+            expect(result).toStrictEqual([1, 2, 3, new stream_error_1.StreamError(Error(helpers_for_tests_1.DEFAULT_ERROR_TEXT), { num: 4 }), 5, 6, 7, 8]);
+        }));
+        it('Ignores errors given ignoreErrors true', () => __awaiter(void 0, void 0, void 0, function* () {
+            const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
+            const throwingTransform = new simple_async_transform_1.SimpleAsyncTransform((0, helpers_for_tests_1.getFailOnNumberAsyncFunction)(4), {
+                objectMode: true,
+                ignoreErrors: true,
+            });
+            const result = [];
+            throwingTransform.on('data', (data) => result.push(data));
+            a.pipe(throwingTransform);
+            yield (0, helpers_for_tests_1.streamEnd)(throwingTransform);
+            expect(result).toStrictEqual([1, 2, 3, 5, 6, 7, 8]);
+        }));
+        it('Ignores errors given ignoreErrors true even when passing error stream', () => __awaiter(void 0, void 0, void 0, function* () {
+            const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
+            const errorStream = transformer_1.transformer.errorTransform(); // Just for passing errors, will not get them
+            const throwingTransform = new simple_async_transform_1.SimpleAsyncTransform((0, helpers_for_tests_1.getFailOnNumberAsyncFunction)(4), {
+                objectMode: true,
+                ignoreErrors: true,
+                shouldPushErrorsForward: true,
+            });
+            const result = [];
+            throwingTransform.on('data', (data) => result.push(data));
+            a.pipe(throwingTransform);
+            yield (0, helpers_for_tests_1.streamEnd)(throwingTransform);
+            expect(result).toStrictEqual([1, 2, 3, 5, 6, 7, 8]);
         }));
     });
     it('Able to mix different transforms in a single stream', () => __awaiter(void 0, void 0, void 0, function* () {
         const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
         const add1 = (n) => n + 1;
-        const filterOutOdds = (n) => __awaiter(void 0, void 0, void 0, function* () {
-            yield new Promise((res) => setTimeout(res, 100));
+        const numberToString = (n) => __awaiter(void 0, void 0, void 0, function* () { return n.toString(); });
+        const filterOutEvens = (n) => __awaiter(void 0, void 0, void 0, function* () {
+            yield (0, helpers_for_tests_1.sleep)(10);
             return n % 2 ? n : undefined;
         });
-        const numberToString = (n) => __awaiter(void 0, void 0, void 0, function* () { return n.toString(); });
         const add1Transform = new simple_transform_1.SimpleTransform(add1, { objectMode: true });
-        const filterOutOddsTranform = new simple_async_transform_1.SimpleAsyncTransform(filterOutOdds, { objectMode: true });
+        const filterOutOddsTranform = new simple_async_transform_1.SimpleAsyncTransform(filterOutEvens, { objectMode: true });
         const numberToStringTrasnform = new simple_async_transform_1.SimpleAsyncTransform(numberToString, { objectMode: true });
         a.pipe(add1Transform).pipe(filterOutOddsTranform).pipe(numberToStringTrasnform);
         const result = [];

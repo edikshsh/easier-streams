@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const stream_1 = require("stream");
+const promises_1 = require("stream/promises");
 const plumber_1 = require("../streams/plumber");
 const transformer_1 = require("../streams/transformer");
 const helpers_for_tests_1 = require("./helpers-for-tests");
@@ -28,7 +29,7 @@ describe('Test Utility transforms', () => {
                     item.a += 10;
                     modified.push(item);
                 };
-                const sideEffectsTransform = transformer_1.transformer.callOnDataSync(increaseBy10);
+                const sideEffectsTransform = transformer_1.transformer.callOnData(increaseBy10);
                 const b = a.pipe(sideEffectsTransform);
                 const result = [];
                 const modified = [];
@@ -48,7 +49,7 @@ describe('Test Utility transforms', () => {
                     item.a += 10;
                     modified.push(item);
                 };
-                const sideEffectsTransform = transformer_1.transformer.callOnDataSync(increaseBy10);
+                const sideEffectsTransform = transformer_1.transformer.callOnData(increaseBy10);
                 const pt = transformer_1.transformer.passThrough();
                 const b = a.pipe(sideEffectsTransform).pipe(pt);
                 const result = [];
@@ -134,13 +135,7 @@ describe('Test Utility transforms', () => {
         }));
         it('should filter out on crash when considerErrorAsFilterOut is true', () => __awaiter(void 0, void 0, void 0, function* () {
             const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
-            const filterOutOdds = (n) => {
-                if (n % 2 === 1) {
-                    throw Error('asdf');
-                }
-                return true;
-            };
-            const b = a.pipe(transformer_1.transformer.filter(filterOutOdds, { considerErrorAsFilterOut: true }));
+            const b = a.pipe(transformer_1.transformer.filter(helpers_for_tests_1.filterOutOddsSync, { considerErrorAsFilterOut: true }));
             const result = [];
             b.on('data', (data) => result.push(data));
             yield (0, helpers_for_tests_1.streamEnd)(b);
@@ -150,7 +145,7 @@ describe('Test Utility transforms', () => {
             const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
             const filterOutOdds = (n) => {
                 if (n % 2 === 0) {
-                    throw Error('asdf');
+                    throw Error(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
                 }
                 return true;
             };
@@ -158,7 +153,7 @@ describe('Test Utility transforms', () => {
             const result = [];
             b.on('data', (data) => result.push(data));
             const streamPromise = (0, helpers_for_tests_1.streamEnd)(b);
-            yield expect(streamPromise).rejects.toThrow('asdf');
+            yield expect(streamPromise).rejects.toThrow(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
             expect(result).toEqual([1]);
         }));
         it('should pass error if given error stream', () => __awaiter(void 0, void 0, void 0, function* () {
@@ -167,11 +162,11 @@ describe('Test Utility transforms', () => {
             const passThrough = transformer_1.transformer.passThrough();
             const filterOutOdds = (n) => {
                 if (n % 2 === 1) {
-                    throw Error('asdf');
+                    throw Error(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
                 }
                 return true;
             };
-            const b = transformer_1.transformer.filter(filterOutOdds, { errorStream });
+            const b = transformer_1.transformer.filter(filterOutOdds, { shouldPushErrorsForward: true });
             plumber_1.plumber.pipe({}, a, b);
             plumber_1.plumber.pipe({ errorStream }, b, passThrough);
             passThrough.on('data', () => undefined);
@@ -189,8 +184,7 @@ describe('Test Utility transforms', () => {
             const keptValues = [];
             const filteredValues = [];
             const a = transformer_1.transformer.fromIterable([1, 2, 3, 4, 5, 6, 7, 8]);
-            const filterOutOdds = (n) => n % 2 === 0;
-            const { filterFalseTransform, filterTrueTransform } = transformer_1.transformer.fork(filterOutOdds);
+            const { filterFalseTransform, filterTrueTransform } = transformer_1.transformer.fork(helpers_for_tests_1.filterOutOddsSync);
             plumber_1.plumber.pipe({}, a, [filterFalseTransform, filterTrueTransform]);
             filterTrueTransform.on('data', (evenNumber) => keptValues.push(evenNumber));
             filterFalseTransform.on('data', (oddNumber) => filteredValues.push(oddNumber));
@@ -199,9 +193,6 @@ describe('Test Utility transforms', () => {
             expect(filteredValues).toEqual([1, 3, 5, 7]);
         }));
     });
-    // function isNumber(n: unknown): n is number{
-    //     return typeof n === 'number'
-    // }
     describe('filterType', () => {
         it('should filter out by type correctly', () => __awaiter(void 0, void 0, void 0, function* () {
             const a = stream_1.Readable.from([1, '2', 3, '4', 5, '6', 7, '8']);
@@ -227,13 +218,7 @@ describe('Test Utility transforms', () => {
         }));
         it('should filter out on crash when considerErrorAsFilterOut is true', () => __awaiter(void 0, void 0, void 0, function* () {
             const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
-            const filterOutOdds = (n) => __awaiter(void 0, void 0, void 0, function* () {
-                if (n % 2 === 1) {
-                    throw Error('asdf');
-                }
-                return true;
-            });
-            const b = a.pipe(transformer_1.transformer.async.filter(filterOutOdds, { considerErrorAsFilterOut: true }));
+            const b = a.pipe(transformer_1.transformer.async.filter((0, helpers_for_tests_1.filterOutOddsAsync)(), { considerErrorAsFilterOut: true }));
             const result = [];
             b.on('data', (data) => result.push(data));
             yield (0, helpers_for_tests_1.streamEnd)(b);
@@ -243,7 +228,7 @@ describe('Test Utility transforms', () => {
             const a = stream_1.Readable.from([1, 2, 3, 4, 5, 6, 7, 8]);
             const filterOutOdds = (n) => __awaiter(void 0, void 0, void 0, function* () {
                 if (n % 2 === 0) {
-                    throw Error('asdf');
+                    throw Error(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
                 }
                 return true;
             });
@@ -251,7 +236,7 @@ describe('Test Utility transforms', () => {
             const result = [];
             b.on('data', (data) => result.push(data));
             const streamPromise = (0, helpers_for_tests_1.streamEnd)(b);
-            yield expect(streamPromise).rejects.toThrow('asdf');
+            yield expect(streamPromise).rejects.toThrow(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
             expect(result).toEqual([1]);
         }));
         it('should pass error if given error stream', () => __awaiter(void 0, void 0, void 0, function* () {
@@ -260,11 +245,11 @@ describe('Test Utility transforms', () => {
             const passThrough = transformer_1.transformer.passThrough();
             const filterOutOdds = (n) => __awaiter(void 0, void 0, void 0, function* () {
                 if (n % 2 === 1) {
-                    throw Error('asdf');
+                    throw Error(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
                 }
                 return true;
             });
-            const b = transformer_1.transformer.async.filter(filterOutOdds, { errorStream });
+            const b = transformer_1.transformer.async.filter(filterOutOdds, { shouldPushErrorsForward: true });
             const result = [];
             const errors = [];
             passThrough.on('data', (data) => result.push(data));
@@ -367,11 +352,11 @@ describe('Test Utility transforms', () => {
             const errorStream = transformer_1.transformer.errorTransform();
             const add1WithError = (n) => {
                 if (n % 2 === 0) {
-                    throw Error('asdf');
+                    throw Error(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
                 }
                 return n + 1;
             };
-            const add1Transform = transformer_1.transformer.fromFunction(add1WithError, { errorStream });
+            const add1Transform = transformer_1.transformer.fromFunction(add1WithError, { shouldPushErrorsForward: true });
             plumber_1.plumber.pipeOneToOne(a, add1Transform);
             const passThrough = transformer_1.transformer.passThrough();
             plumber_1.plumber.pipeOneToOne(add1Transform, passThrough, { errorStream });
@@ -388,7 +373,7 @@ describe('Test Utility transforms', () => {
             const a = transformer_1.transformer.fromIterable([1, 2, 3, 4, 5, 6, 7, 8]);
             const errorStream = transformer_1.transformer.errorTransform();
             const add1 = (n) => n + 1;
-            const add1Transform = transformer_1.transformer.fromFunction(add1, { errorStream });
+            const add1Transform = transformer_1.transformer.fromFunction(add1, { shouldPushErrorsForward: true });
             plumber_1.plumber.pipeOneToOne(a, add1Transform, { errorStream });
             plumber_1.plumber.pipeOneToOne(add1Transform, transformer_1.transformer.void(), { errorStream });
             const result = [];
@@ -458,11 +443,11 @@ describe('Test Utility transforms', () => {
             const errorStream = transformer_1.transformer.errorTransform();
             const add1WithError = (n) => __awaiter(void 0, void 0, void 0, function* () {
                 if (n % 2 === 0) {
-                    throw Error('asdf');
+                    throw Error(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
                 }
                 return n + 1;
             });
-            const add1Transform = transformer_1.transformer.async.fromFunction(add1WithError, { errorStream });
+            const add1Transform = transformer_1.transformer.async.fromFunction(add1WithError, { shouldPushErrorsForward: true });
             plumber_1.plumber.pipeOneToOne(a, add1Transform);
             const passThrough = transformer_1.transformer.passThrough();
             plumber_1.plumber.pipeOneToOne(add1Transform, passThrough, { errorStream });
@@ -479,7 +464,7 @@ describe('Test Utility transforms', () => {
             const a = transformer_1.transformer.fromIterable([1, 2, 3, 4, 5, 6, 7, 8]);
             const errorStream = transformer_1.transformer.errorTransform();
             const add1 = (n) => __awaiter(void 0, void 0, void 0, function* () { return n + 1; });
-            const add1Transform = transformer_1.transformer.async.fromFunction(add1, { errorStream });
+            const add1Transform = transformer_1.transformer.async.fromFunction(add1, { shouldPushErrorsForward: true });
             plumber_1.plumber.pipeOneToOne(a, add1Transform, { errorStream });
             plumber_1.plumber.pipeOneToOne(add1Transform, transformer_1.transformer.void(), { errorStream });
             const result = [];
@@ -547,12 +532,8 @@ describe('Test Utility transforms', () => {
             const arr = [...Array(inputLength).keys()];
             const outArr = [];
             const startTime = Date.now();
-            const action = (n) => __awaiter(void 0, void 0, void 0, function* () {
-                yield new Promise((res) => setTimeout(res, delay));
-                return n * 2;
-            });
             const concurrency = 5;
-            const { input, output } = transformer_1.transformer.async.fromFunctionConcurrent(action, concurrency);
+            const { input, output } = transformer_1.transformer.async.fromFunctionConcurrent((0, helpers_for_tests_1.delayer)(delay), concurrency);
             stream_1.Readable.from(arr).pipe(input);
             output.on('data', (data) => {
                 outArr.push(data);
@@ -560,35 +541,20 @@ describe('Test Utility transforms', () => {
             yield output.promisifyEvents(['end'], ['error']);
             expect(estimatedRunTimeSequential).toBeGreaterThan(Date.now() - startTime);
         }));
-        it('should fail send error to output if one of the concurrent actions fails', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('should send error to output if one of the concurrent actions fails', () => __awaiter(void 0, void 0, void 0, function* () {
             const delay = 20;
             const inputLength = 100;
             const errorOnIndex = 20;
             const arr = [...Array(inputLength).keys()];
             const outArr = [];
-            const action = (n) => __awaiter(void 0, void 0, void 0, function* () {
-                if (n === errorOnIndex) {
-                    throw new Error('asdf');
-                }
-                yield new Promise((res) => setTimeout(res, delay));
-                return n * 2;
-            });
             const concurrency = 5;
-            const { input, output } = transformer_1.transformer.async.fromFunctionConcurrent(action, concurrency);
+            const { input, output } = transformer_1.transformer.async.fromFunctionConcurrent((0, helpers_for_tests_1.getFailOnNumberAsyncFunctionMult2)(errorOnIndex, delay), concurrency);
             stream_1.Readable.from(arr).pipe(input);
             output.on('data', (data) => {
                 outArr.push(data);
             });
-            try {
-                yield output.promisifyEvents(['end'], ['error']);
-            }
-            catch (error) {
-                expect(error).toEqual(new Error('asdf'));
-                expect(outArr.length).toBeLessThan(errorOnIndex);
-            }
-            finally {
-                expect.assertions(2);
-            }
+            yield expect(output.promisifyEvents(['end'], ['error'])).rejects.toThrow(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
+            expect(outArr.length).toBeLessThan(errorOnIndex);
         }));
         it('doesnt break backpressure', () => __awaiter(void 0, void 0, void 0, function* () {
             const delay = 20;
@@ -596,12 +562,8 @@ describe('Test Utility transforms', () => {
             const arr = [...Array(inputLength).keys()];
             const outArr = [];
             let chunksPassedInInput = 0;
-            const action = (n) => __awaiter(void 0, void 0, void 0, function* () {
-                yield new Promise((res) => setTimeout(res, delay));
-                return n * 2;
-            });
             const concurrency = 2;
-            const { input, output } = transformer_1.transformer.async.fromFunctionConcurrent(action, concurrency);
+            const { input, output } = transformer_1.transformer.async.fromFunctionConcurrent((0, helpers_for_tests_1.delayer)(delay), concurrency);
             stream_1.Readable.from(arr).pipe(input);
             input.on('data', () => chunksPassedInInput++);
             output.on('data', (data) => {
@@ -613,20 +575,95 @@ describe('Test Utility transforms', () => {
             yield output.promisifyEvents(['end'], ['error']);
             expect(outArr.length).toBe(inputLength);
         }));
+        it('should not break pipeline chain of error passing if error comes before concurrent', () => __awaiter(void 0, void 0, void 0, function* () {
+            const delay = 10;
+            const inputLength = 30;
+            const errorOnIndex = 10;
+            const arr = [...Array(inputLength).keys()];
+            const outArr = [];
+            const concurrency = 5;
+            const erroringTranform = transformer_1.transformer.fromFunction((0, helpers_for_tests_1.getFailOnNumberFunction)(4));
+            const { input, output } = transformer_1.transformer.async.fromFunctionConcurrent((0, helpers_for_tests_1.delayer)(delay), concurrency);
+            const source = transformer_1.transformer.fromIterable(arr);
+            (0, promises_1.pipeline)(source, erroringTranform, input).catch(() => undefined);
+            (0, promises_1.pipeline)(output, transformer_1.transformer.void()).catch(() => undefined);
+            output.on('data', (data) => {
+                outArr.push(data);
+            });
+            yield expect(source.promisifyEvents('close', 'error')).rejects.toThrow(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
+            expect(outArr.length).toBeLessThan(errorOnIndex);
+        }));
+        it('should not break pipeline chain of error passing if error comes after concurrent', () => __awaiter(void 0, void 0, void 0, function* () {
+            const delay = 10;
+            const inputLength = 30;
+            const errorOnIndex = 10;
+            const arr = [...Array(inputLength).keys()];
+            const outArr = [];
+            const concurrency = 5;
+            const erroringTranform = transformer_1.transformer.fromFunction((0, helpers_for_tests_1.getFailOnNumberFunction)(4));
+            const passThrough = transformer_1.transformer.passThrough();
+            const { input, output } = transformer_1.transformer.async.fromFunctionConcurrent((0, helpers_for_tests_1.delayer)(delay), concurrency, {});
+            const source = stream_1.Readable.from(arr);
+            (0, promises_1.pipeline)(source, input).catch(() => undefined);
+            (0, promises_1.pipeline)(output, erroringTranform, passThrough).catch(() => undefined);
+            passThrough.on('data', (data) => {
+                outArr.push(data);
+            });
+            yield expect(passThrough.promisifyEvents('end', 'error')).rejects.toThrow(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
+            expect(outArr.length).toBeLessThan(errorOnIndex);
+        }));
+        it('should not break pipeline chain of error passing if concurrent errors', () => __awaiter(void 0, void 0, void 0, function* () {
+            const delay = 10;
+            const inputLength = 30;
+            const errorOnIndex = 10;
+            const arr = [...Array(inputLength).keys()];
+            const outArr = [];
+            const concurrency = 5;
+            const passThrough = transformer_1.transformer.passThrough();
+            const { input, output } = transformer_1.transformer.async.fromFunctionConcurrent((0, helpers_for_tests_1.getFailOnNumberAsyncFunctionMult2)(errorOnIndex, delay), concurrency, {});
+            const source = stream_1.Readable.from(arr);
+            (0, promises_1.pipeline)(source, input).catch(() => undefined);
+            (0, promises_1.pipeline)(output, passThrough).catch(() => undefined);
+            passThrough.on('data', (data) => {
+                outArr.push(data);
+            });
+            yield expect(passThrough.promisifyEvents('end', 'error')).rejects.toThrow(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
+            expect(outArr.length).toBeLessThan(errorOnIndex);
+        }));
+        it('should return correct data when using pipeline', () => __awaiter(void 0, void 0, void 0, function* () {
+            const delay = 10;
+            const inputLength = 30;
+            const arr = [...Array(inputLength).keys()];
+            const outArr = [];
+            const expectedOutput = arr.map((n) => n * 2);
+            const concurrency = 5;
+            const passThrough = transformer_1.transformer.passThrough();
+            const { input, output } = transformer_1.transformer.async.fromFunctionConcurrent((0, helpers_for_tests_1.delayerMult2)(delay), concurrency, {});
+            const source = stream_1.Readable.from(arr);
+            (0, promises_1.pipeline)(source, input).catch(() => undefined);
+            (0, promises_1.pipeline)(output, passThrough).catch(() => undefined);
+            output.on('data', (data) => {
+                outArr.push(data);
+            });
+            yield output.promisifyEvents('end', 'error');
+            expect(outArr).toEqual(expectedOutput);
+        }));
     });
     describe('fromFunctionConcurrent2', () => {
+        const errorOn4 = (n) => {
+            if (n === 4) {
+                throw Error(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
+            }
+            return n;
+        };
         it('should return correct but unordered output', () => __awaiter(void 0, void 0, void 0, function* () {
             const delay = 20;
             const inputLength = 200;
             const arr = [...Array(inputLength).keys()].map((i) => i + 1);
             const expectedOutput = arr.map((n) => n * 2);
             const outArr = [];
-            const action = (n) => __awaiter(void 0, void 0, void 0, function* () {
-                yield new Promise((res) => setTimeout(res, delay));
-                return n * 2;
-            });
             const concurrency = 5;
-            const concurrentTransform = transformer_1.transformer.async.fromFunctionConcurrent2(action, concurrency);
+            const concurrentTransform = transformer_1.transformer.async.fromFunctionConcurrent2((0, helpers_for_tests_1.delayerMult2)(delay), concurrency);
             stream_1.Readable.from(arr).pipe(concurrentTransform);
             concurrentTransform.on('data', (data) => {
                 outArr.push(data);
@@ -642,12 +679,8 @@ describe('Test Utility transforms', () => {
             const arr = [...Array(inputLength).keys()];
             const outArr = [];
             const startTime = Date.now();
-            const action = (n) => __awaiter(void 0, void 0, void 0, function* () {
-                yield new Promise((res) => setTimeout(res, delay));
-                return n * 2;
-            });
             const concurrency = 5;
-            const concurrentTransform = transformer_1.transformer.async.fromFunctionConcurrent2(action, concurrency);
+            const concurrentTransform = transformer_1.transformer.async.fromFunctionConcurrent2((0, helpers_for_tests_1.delayerMult2)(delay), concurrency);
             stream_1.Readable.from(arr).pipe(concurrentTransform);
             concurrentTransform.on('data', (data) => {
                 outArr.push(data);
@@ -655,35 +688,58 @@ describe('Test Utility transforms', () => {
             yield concurrentTransform.promisifyEvents(['end'], ['error']);
             expect(estimatedRunTimeSequential).toBeGreaterThan(Date.now() - startTime);
         }));
-        it('should fail send error to output if one of the concurrent actions fails', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('should send error to output if one of the concurrent actions fails', () => __awaiter(void 0, void 0, void 0, function* () {
             const delay = 20;
             const inputLength = 100;
             const errorOnIndex = 20;
             const arr = [...Array(inputLength).keys()];
             const outArr = [];
-            const action = (n) => __awaiter(void 0, void 0, void 0, function* () {
-                if (n === errorOnIndex) {
-                    throw new Error('asdf');
-                }
-                yield new Promise((res) => setTimeout(res, delay));
-                return n * 2;
-            });
             const concurrency = 5;
-            const concurrentTransform = transformer_1.transformer.async.fromFunctionConcurrent2(action, concurrency);
+            const concurrentTransform = transformer_1.transformer.async.fromFunctionConcurrent2((0, helpers_for_tests_1.getFailOnNumberAsyncFunctionMult2)(errorOnIndex, delay), concurrency);
             stream_1.Readable.from(arr).pipe(concurrentTransform);
             concurrentTransform.on('data', (data) => {
                 outArr.push(data);
             });
-            try {
-                yield concurrentTransform.promisifyEvents(['end'], ['error']);
-            }
-            catch (error) {
-                expect(error).toEqual(new Error('asdf'));
-                expect(outArr.length).toBeLessThan(errorOnIndex);
-            }
-            finally {
-                expect.assertions(2);
-            }
+            yield expect(concurrentTransform.promisifyEvents(['end'], ['error'])).rejects.toThrow(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
+            expect(outArr.length).toBeLessThan(errorOnIndex);
+        }));
+        it('should not break pipeline chain of error passing if error comes before concurrent', () => __awaiter(void 0, void 0, void 0, function* () {
+            const delay = 10;
+            const inputLength = 30;
+            const arr = [...Array(inputLength).keys()];
+            const concurrency = 5;
+            const erroringTranform = transformer_1.transformer.fromFunction(errorOn4);
+            const concurrentTransform = transformer_1.transformer.async.fromFunctionConcurrent2((0, helpers_for_tests_1.delayer)(delay), concurrency);
+            const source = transformer_1.transformer.fromIterable(arr);
+            const p = concurrentTransform.promisifyEvents('close', 'error');
+            (0, promises_1.pipeline)(source, erroringTranform, concurrentTransform).catch(() => undefined);
+            yield expect(p).rejects.toThrow(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
+        }));
+        it('should not break pipeline chain of error passing if error comes after concurrent', () => __awaiter(void 0, void 0, void 0, function* () {
+            const delay = 10;
+            const inputLength = 30;
+            const arr = [...Array(inputLength).keys()];
+            const concurrency = 5;
+            const concurrentTransform = transformer_1.transformer.async.fromFunctionConcurrent2((0, helpers_for_tests_1.delayer)(delay), concurrency);
+            const erroringTranform = transformer_1.transformer.fromFunction(errorOn4);
+            const passThrough = transformer_1.transformer.passThrough();
+            const source = transformer_1.transformer.fromIterable(arr);
+            const p = passThrough.promisifyEvents('close', 'error');
+            (0, promises_1.pipeline)(source, concurrentTransform, erroringTranform, passThrough).catch(() => undefined);
+            yield expect(p).rejects.toThrow(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
+        }));
+        it('should not break pipeline chain of error passing if concurrent errors', () => __awaiter(void 0, void 0, void 0, function* () {
+            const delay = 10;
+            const inputLength = 30;
+            const errorOnIndex = 10;
+            const arr = [...Array(inputLength).keys()];
+            const concurrency = 5;
+            const concurrentTransform = transformer_1.transformer.async.fromFunctionConcurrent2((0, helpers_for_tests_1.getFailOnNumberAsyncFunctionMult2)(errorOnIndex, delay), concurrency);
+            const passThrough = transformer_1.transformer.passThrough();
+            const source = transformer_1.transformer.fromIterable(arr);
+            const p = passThrough.promisifyEvents('close', 'error');
+            (0, promises_1.pipeline)(source, concurrentTransform, passThrough).catch(() => undefined);
+            yield expect(p).rejects.toThrow(helpers_for_tests_1.DEFAULT_ERROR_TEXT);
         }));
         it('doesnt break backpressure', () => __awaiter(void 0, void 0, void 0, function* () {
             const delay = 10;
@@ -691,12 +747,8 @@ describe('Test Utility transforms', () => {
             const arr = [...Array(inputLength).keys()];
             const outArr = [];
             let chunksPassedInInput = 0;
-            const action = (n) => __awaiter(void 0, void 0, void 0, function* () {
-                yield new Promise((res) => setTimeout(res, delay));
-                return n * 2;
-            });
             const concurrency = 2;
-            const concurrentTransform = transformer_1.transformer.async.fromFunctionConcurrent2(action, concurrency);
+            const concurrentTransform = transformer_1.transformer.async.fromFunctionConcurrent2((0, helpers_for_tests_1.delayer)(delay), concurrency);
             const readable = stream_1.Readable.from(arr);
             readable.pipe(concurrentTransform);
             readable.on('data', () => chunksPassedInInput++);
@@ -756,4 +808,4 @@ describe('Test Utility transforms', () => {
         expect(result).toEqual(['3', '5', '7', '9']);
     }));
 });
-//# sourceMappingURL=test-transforms-helper.spec.js.map
+//# sourceMappingURL=test-transformer.spec.js.map

@@ -1,4 +1,5 @@
-export type TransformEvents<T> = {
+export type TransformEvents<T> = BaseTransformEvents<T> & SourceErrorEvent;
+export type BaseTransformEvents<T> = {
     data: (chunk: T) => void;
     end: () => void;
     close: () => void;
@@ -6,4 +7,8 @@ export type TransformEvents<T> = {
     pause: () => void;
     readable: () => void;
     resume: () => void;
+};
+export declare const SOURCE_ERROR = "source-error";
+export type SourceErrorEvent = {
+    [SOURCE_ERROR]: (error: Error) => void;
 };

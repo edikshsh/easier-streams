@@ -2,7 +2,7 @@ import { Transformer, transformer } from './streams/transformer';
 import { SimpleAsyncTransform } from './streams/transforms/base/simple-async-transform';
 import { SimpleTransform } from './streams/transforms/base/simple-transform';
 import { getStreamPipe } from './streams/stream-pipe';
-import { plumber } from './streams/plumber';
+import { plumber, Plumber } from './streams/plumber';
 import { BaseTransform } from './streams/transforms/base/base-transform';
 import { TypedTransform } from './streams/transforms/typed-transform/typed-transform.interface';
 import { ArrayJoinTransform } from './streams/transforms/utility/array-join-transform';
@@ -20,4 +20,4 @@ import { voidInputTransform } from './streams/transforms/utility/void-input-tran
 import { ErrorTransform } from './streams/errors/error-transform';
 import { StreamError } from './streams/errors/stream-error';
 declare const StreamPipe: typeof getStreamPipe;
-export { transformer, Transformer, plumber, StreamPipe, SimpleTransform, SimpleAsyncTransform, BaseTransform, TypedTransform, ArrayJoinTransform, ArraySplitTransform, callOnDataSyncTransform, callOnDataAsyncTransform, filterTransform, asyncFilterTransform, typeFilterTransform, fromFunctionConcurrentTransform, fromFunctionTransform, fromAsyncFunctionTransform, fromIterable, pickElementFromArrayTransform, TypedPassThrough, TypedEventEmitter, voidInputTransform, ErrorTransform, StreamError, };
+export { transformer, Transformer, plumber, Plumber, StreamPipe, SimpleTransform, SimpleAsyncTransform, BaseTransform, TypedTransform, ArrayJoinTransform, ArraySplitTransform, callOnDataSyncTransform, callOnDataAsyncTransform, filterTransform, asyncFilterTransform, typeFilterTransform, fromFunctionConcurrentTransform, fromFunctionTransform, fromAsyncFunctionTransform, fromIterable, pickElementFromArrayTransform, TypedPassThrough, TypedEventEmitter, voidInputTransform, ErrorTransform, StreamError, };

@@ -26,10 +26,10 @@ class ErrorTransform extends base_transform_1.BaseTransform {
         this.totalInputs += inputLayer.length;
         for (const event in this.streamGroupControllerEventCounter) {
             inputLayer.forEach((input) => {
-                input.once(event, () => {
+                input.once(event, (data) => {
                     const inputsCalledCurrentEvent = ++this.streamGroupControllerEventCounter[event];
                     if (inputsCalledCurrentEvent === this.totalInputs) {
-                        output.emit(event);
+                        output.emit(event, data);
                     }
                 });
             });

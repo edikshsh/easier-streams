@@ -8,6 +8,7 @@ import { ArraySplitTransform } from './transforms/utility/array-split-transform'
 import { FilterOptions } from './transforms/utility/filter-transforms';
 import { TypedPassThrough } from './transforms/utility/typed-pass-through';
 import { ArrayJoinTransform } from './transforms/utility/array-join-transform';
+import { PlumberOptions } from './utility/plumber-options.type';
 export declare class TransformerBase {
     private defaultTrasformOptions?;
     constructor(defaultTrasformOptions?: TransformOptions | undefined);
@@ -19,7 +20,7 @@ export declare class Transformer extends TransformerBase {
     constructor(defaultTrasformOptions?: TransformOptions);
     arrayJoin<TSource>(length: number, options?: FullTransformOptions<TSource>): ArrayJoinTransform<TSource>;
     arraySplit<TSource>(options?: FullTransformOptions<TSource[]>): ArraySplitTransform<TSource[]>;
-    callOnDataSync<TSource>(functionToCallOnData: (data: TSource) => void, options?: FullTransformOptions<TSource>): import("./transforms/base/simple-transform").SimpleTransform<TSource, TSource>;
+    callOnData<TSource>(functionToCallOnData: (data: TSource) => void, options?: FullTransformOptions<TSource>): import("./transforms/base/simple-transform").SimpleTransform<TSource, TSource>;
     void<TSource>(options?: FullTransformOptions<TSource>): import("./transforms/base/simple-transform").SimpleTransform<TSource, void>;
     passThrough<T>(options?: FullTransformOptions<T>): TypedPassThrough<T>;
     filter<TSource>(filterFunction: (chunk: TSource) => boolean, options?: FullTransformOptions<TSource> & FilterOptions): import("./transforms/base/simple-transform").SimpleTransform<TSource, TSource>;
@@ -40,7 +41,7 @@ export declare class AsyncTransformer extends TransformerBase {
         filterFalseTransform: import("./transforms/base/simple-async-transform").SimpleAsyncTransform<TSource, TSource>;
     };
     fromFunction<TSource, TDestination>(transformer: AsyncTransformFunction<TSource, TDestination | undefined>, options?: FullTransformOptions<TSource>): import("./transforms/base/simple-async-transform").SimpleAsyncTransform<TSource, TDestination>;
-    fromFunctionConcurrent<TSource, TDestination>(transformer: AsyncTransformFunction<TSource, TDestination | undefined>, concurrency: number, options?: FullTransformOptions<any>): {
+    fromFunctionConcurrent<TSource, TDestination>(transformer: AsyncTransformFunction<TSource, TDestination | undefined>, concurrency: number, options?: FullTransformOptions<any>, plumberOptions?: PlumberOptions<any>): {
         input: TypedPassThrough<TSource>;
         output: TypedPassThrough<TDestination>;
     };

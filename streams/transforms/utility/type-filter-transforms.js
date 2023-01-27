@@ -8,7 +8,7 @@ function typeFilterTransform(typeFilterFunction, options) {
             return typeFilterFunction(chunk) ? chunk : undefined;
         }
         catch (error) {
-            if (options === null || options === void 0 ? void 0 : options.errorStream) {
+            if (options === null || options === void 0 ? void 0 : options.shouldPushErrorsForward) {
                 throw error;
             }
             return undefined;

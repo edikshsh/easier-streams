@@ -11,7 +11,7 @@ type StreamPipeEvents<T> = {
 };
 /**
  * Deprecated
- * Use pipeHelper
+ * Use Plumber
  */
 declare class StreamPipe<Tsource, Tdestination> extends TypedEventEmitter<StreamPipeEvents<Tdestination>> {
     private _source;
