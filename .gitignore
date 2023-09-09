@@ -2,3 +2,4 @@
 /package-tests
 /dist
 /*.tgz
+/src/temp
