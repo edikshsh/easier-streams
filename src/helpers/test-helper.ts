@@ -41,6 +41,13 @@ export function delayerMult2(delay: number) {
     };
 }
 
+export function thrower<T>() {
+    return (chunk: T) => {
+        throw Error(DEFAULT_ERROR_TEXT);
+        return chunk;
+    };
+}
+
 export function add(n: number) {
     return (chunk: number) => chunk + n;
 }

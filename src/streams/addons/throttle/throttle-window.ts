@@ -2,7 +2,7 @@ import { MAX_TIME_FRAMES } from '../max-time-frames';
 import { GroupTimeFrame } from './group-time-frame';
 import { splitSumArray } from './split-sum-array';
 
-export class Throttler {
+export class ThrottleWindow {
     readonly groupTimeFrames: GroupTimeFrame[];
     constructor(private timeFrameMs: number, messagesInTimeFrame: number) {
         const timeFramesToCreate = Math.min(messagesInTimeFrame, MAX_TIME_FRAMES);

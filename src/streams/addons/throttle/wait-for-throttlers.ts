@@ -1,7 +1,7 @@
 import { sleep } from '../../../helpers/helper-functions';
-import { Throttler } from './throttler';
+import { ThrottleWindow } from './throttle-window';
 
-export async function waitForThrottlers(throttlers: Throttler[]): Promise<void> {
+export async function waitForThrottlers(throttlers: ThrottleWindow[]): Promise<void> {
     const now = Date.now();
     const timeToWait = Math.max(...throttlers.map((throttler) => throttler.msToWaitForNextChunk(now)));
     await sleep(timeToWait);
