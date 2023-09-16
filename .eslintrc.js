@@ -1,26 +1,18 @@
 module.exports = {
     env: {
         browser: true,
-        es2021: true
+        es2021: true,
     },
-    extends: [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
-    ],
-    overrides: [
-    ],
-    parser: "@typescript-eslint/parser",
+    extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
+    overrides: [],
+    parser: '@typescript-eslint/parser',
     parserOptions: {
-        ecmaVersion: "latest",
-        sourceType: "module",
-        project: './tsconfig.json',
-
+        ecmaVersion: 'latest',
+        sourceType: 'module',
     },
-    plugins: [
-        "@typescript-eslint"
-    ],
+    plugins: ['@typescript-eslint'],
     rules: {
-        "@typescript-eslint/no-floating-promises": "error",
-        "@typescript-eslint/no-misused-promises": "error"
-    }
-}
+        '@typescript-eslint/no-floating-promises': 'error',
+        '@typescript-eslint/no-misused-promises': 'error',
+    },
+};

@@ -6,8 +6,9 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "test": "jest ./src/tests",
-        "copy-package-json": "copyfiles package.json dist",
-        "pack": "tsc && npm run copy-package-json && npm pack"
+        "copy-files": "copyfiles package.json README.md dist",
+        "pack": "tsc && npm run copy-files && cd dist && npm pack && move easier-streams*.tgz ../",
+        "publish": "cd dist && npm publish"
     },
     "author": "",
     "license": "ISC",
