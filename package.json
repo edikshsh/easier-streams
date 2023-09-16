@@ -6,6 +6,7 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "test": "jest ./src/tests",
+        "test:addons": "jest ./src/tests/__tests__/addons",
         "copy-files": "copyfiles package.json README.md dist",
         "pack": "tsc && npm run copy-files && cd dist && npm pack && move easier-streams*.tgz ../",
         "publish": "cd dist && npm publish"
@@ -16,6 +17,7 @@
         "lodash.clonedeep": "^4.5.0"
     },
     "devDependencies": {
+        "easier-streams-file": "file:easier-streams-0.2.0.tgz",
         "@types/jest": "^27.5.2",
         "@types/lodash.clonedeep": "^4.5.7",
         "@types/node": "^18.7.20",
