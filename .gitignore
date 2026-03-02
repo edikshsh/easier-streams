@@ -3,4 +3,5 @@
 /dist
 /*.tgz
 /src/temp
+/.vscode
 TODO.txt
