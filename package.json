@@ -18,7 +18,7 @@
     "devDependencies": {
         "@types/jest": "^27.5.2",
         "@types/lodash.clonedeep": "^4.5.7",
-        "@types/node": "^18.7.20",
+        "@types/node": "^20.19.35",
         "@types/uuid": "^8.3.4",
         "@typescript-eslint/parser": "^6.6.0",
         "copyfiles": "^2.4.1",
