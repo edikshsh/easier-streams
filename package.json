@@ -12,12 +12,8 @@
     },
     "author": "",
     "license": "ISC",
-    "dependencies": {
-        "lodash.clonedeep": "^4.5.0"
-    },
     "devDependencies": {
         "@types/jest": "^27.5.2",
-        "@types/lodash.clonedeep": "^4.5.7",
         "@types/node": "^20.19.35",
         "@types/uuid": "^8.3.4",
         "@typescript-eslint/parser": "^6.6.0",

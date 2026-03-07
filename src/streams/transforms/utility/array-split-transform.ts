@@ -1,13 +1,12 @@
-import { FullTransformOptions } from '../types/full-transform-options.type';
+import { TransformOptions } from 'stream';
 import { SimpleTransform, TransformFunction } from '../base/simple-transform';
 
 type ArrayElementType<T extends unknown[]> = T extends (infer U)[] ? U : never;
 
-
-export function arraySplitTransform<TSource extends unknown[]>(options?: FullTransformOptions<TSource>){
-    const transformer: TransformFunction<TSource, ArrayElementType<TSource>> = (chunks, transform) => {
+export function arraySplitTransform<TSource extends unknown[]>(options?: TransformOptions) {
+    const transformer: TransformFunction<TSource, ArrayElementType<TSource> | undefined> = (chunks, transform) => {
         chunks.forEach((chunk) => transform.push(chunk));
-        return undefined as ArrayElementType<TSource>
+        return undefined;
     };
-    return new SimpleTransform(transformer,options)
+    return new SimpleTransform(transformer, options);
 }

@@ -1,5 +1,3 @@
-import { Transform } from 'stream';
-import { BaseTransform } from '../streams/transforms/base/base-transform';
 import { sleep } from './helper-functions';
 
 export function getFailOnNumberFunction(input: number, errorText = DEFAULT_ERROR_TEXT) {
@@ -49,30 +47,16 @@ export function addAsync(n: number) {
     return async (chunk: number) => chunk + n;
 }
 
-export function failOnOddsSync(n: number) {
-    if (n % 2 === 0) {
-        throw Error(DEFAULT_ERROR_TEXT);
-    }
-    return n;
-}
-
-export function failOnEvensSync(n: number) {
-    if (n % 2 === 1) {
-        throw Error(DEFAULT_ERROR_TEXT);
-    }
-    return n;
-}
-
-export async function failOnOddsAsync(n: number) {
-    return failOnOddsSync(n);
-}
-
-export async function failOnEvensAsync(n: number) {
-    return !failOnOddsSync(n);
-}
-
 export function filterOutOddsSync(n: number) {
     return !(n % 2);
+}
+
+export function filterOutEvens(n: number): number | undefined {
+    return n % 2 ? n : undefined;
+}
+
+export async function filterOutEvensAsync(n: number): Promise<number | undefined> {
+    return n % 2 ? n : undefined;
 }
 
 export function filterOutOddsAsync(delay?: number) {
@@ -82,16 +66,6 @@ export function filterOutOddsAsync(delay?: number) {
         }
         return !(n % 2);
     };
-}
-
-export async function streamToArray<TSource, TDestination>(
-    transform: BaseTransform<TSource, TDestination> | Transform,
-) {
-    const arr: TDestination[] = [];
-    for await (const chunk of transform) {
-        arr.push(chunk);
-    }
-    return arr;
 }
 
 export function numberToString(n: number) {

@@ -1,7 +1,7 @@
+import { TransformOptions } from 'stream';
 import { SimpleAsyncTransform } from '../base/simple-async-transform';
 import { SimpleTransform } from '../base/simple-transform';
 import { AsyncFilterFunction, FilterFunction } from '../types/filter-function.type';
-import { FullTransformOptions } from '../types/full-transform-options.type';
 
 export type FilterOptions = {
     considerErrorAsFilterOut?: boolean;
@@ -9,7 +9,7 @@ export type FilterOptions = {
 
 export function filterTransform<TSource>(
     filterFunction: FilterFunction<TSource>,
-    options?: FullTransformOptions<TSource> & FilterOptions,
+    options?: TransformOptions & FilterOptions,
 ) {
     const filter = (chunk: TSource) => {
         try {
@@ -23,7 +23,7 @@ export function filterTransform<TSource>(
 
 export function asyncFilterTransform<TSource>(
     filterFunction: AsyncFilterFunction<TSource>,
-    options?: FullTransformOptions<TSource> & FilterOptions,
+    options?: TransformOptions & FilterOptions,
 ) {
     const filter = async (chunk: TSource) => {
         try {
@@ -35,7 +35,7 @@ export function asyncFilterTransform<TSource>(
     return new SimpleAsyncTransform<TSource, TSource>(filter, options);
 }
 
-function onFilterError(error: unknown, considerErrorAsFilterOut?: boolean) {
+export function onFilterError(error: unknown, considerErrorAsFilterOut?: boolean) {
     if (considerErrorAsFilterOut) {
         return undefined;
     }

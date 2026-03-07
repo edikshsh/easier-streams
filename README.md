@@ -1,208 +1,345 @@
+# easier-streams
 
-# Easier streams
+A TypeScript library that makes working with Node.js streams easier. Provides typed transforms, async support, and a typed event emitter with promise helpers.
 
-  
+## Installation
+
+```bash
+npm install easier-streams
+```
 
 ## Events
 
-### Typed event emitter
+### TypedEventEmitter
 
-Define a type for your event emitter:
+A typed wrapper around Node.js `EventEmitter` that enforces correct event names and handler signatures at compile time.
 
-  
+```typescript
+import { TypedEventEmitter } from 'easier-streams';
 
+type MyEvents = {
+    data: (data: number) => void;
+    end: () => void;
+    error: (error: Error) => void;
+};
+
+const emitter = new TypedEventEmitter<MyEvents>();
+
+emitter.on('end', () => undefined);          // ✅
+emitter.on('data', (n) => undefined);        // ✅
+emitter.on('end', (someVar) => undefined);   // ❌ too many args
+emitter.on('unknownEvent', () => undefined); // ❌ unknown event
+
+emitter.emit('end');                         // ✅
+emitter.emit('error', new Error());          // ✅
+emitter.emit('error', 123);                  // ❌ wrong type
+emitter.emit('end', 123);                    // ❌ too many args
 ```
 
-type MyEventEmitterEvents<Data> = {
-data: (data: Data) => void,
-muchData: (data :Data[]) => void,
-end: () => void,
-error: (error: Error) => void
-}
+### promisifyEvents
 
+Create a promise from events on any `TypedEventEmitter`. Accepts an event (or array of events) to resolve on, and optionally events to reject on.
+
+```typescript
+await emitter.promisifyEvents('end', 'error');
+await emitter.promisifyEvents(['data', 'end'], 'error');
+await emitter.promisifyEvents('data', ['error', 'end']);
 ```
 
-Then have it enforced on the event emitter functions:
+All transforms created by this library also support `promisifyEvents`:
 
-```
-const emitter = new TypedEventEmitter<MyEventEmitterEvents<number>>();
-emitter.on('end',(someVar)=>undefined) //❌
-emitter.on('end',()=>undefined)// ✅
-emitter.on('data',(someVar)=>undefined)// ✅
-emitter.on('muchData',(someVar)=>undefined)// ✅
-emitter.on('muchData',(someVar: number)=>undefined)// ❌
-emitter.on('maybeData',12)// ❌
-emitter.emit('end')// ✅
-emitter.emit('end', 123)// ❌
-emitter.emit('error', 123)// ❌
-emitter.emit('error', new Error())// ✅
+```typescript
+const myTransform = transformer.passThrough<number>();
+await myTransform.promisifyEvents('close', 'error');
 ```
 
-### Promisify events
-
-An easy way to create a promise from events, with type checking
-Accepts:
-	- event or events to resolve
-	- event or events to reject
-```
-ee.promisifyEvents(['data'], ['error']);// ✅
-ee.promisifyEvents('data', ['error']);// ✅
-ee.promisifyEvents(['data', 'muchData'], 'error');// ✅
-ee.promisifyEvents('data', ['error', 'end']);// ✅
-ee.promisifyEvents('error', 'data');// Doesn't make sense but ✅
-
-ee.promisifyEvents(['unknownEvent'], ['end']);// ❌
-ee.promisifyEvents('data', 'unknownEvent');// ❌
-
-```
+---
 
 ## Streams
 
-All transforms from this package implement typed event emitter
-```
-myTransform.promisifyEvents('close', 'error');// ✅
-```
-### Transformer
-Makes it easy to create a bunch of useful transforms
+### transformer
 
--  **arrayJoin** - takes a certain amount of chunks, then emits them as an array.
+The main entry point. A pre-configured `Transformer` instance with `objectMode: true`.
 
--  **arraySplit** - takes an array, then emit each element.
-
--  **callOnData** - initialized with a synchronous function, runs this function on deepclone of every chunk.
-
--  **void** - consumes data passed to it without emitting anything.
-
--  **filter** - initialized with a takes a chunk and returns boolean, then filters chunks using said function, emitting only those who returned true.
-
--  **typeFilter** - just like filter but sets the output type. Useful if used together with plumber
-
-- **fork** - pass it a filter function, get 2 transforms, one that keeps the truthy values, one that keeps the others
-
--  **fromFunction** - initialized with a function, then creates a transform using this function.
-
--  **pickElementFromArray** - takes a single index from an array typed chunk.
-
--  **passThrough** - just a typed passThrough transform, passes chunks as is.
-
--  **fromIterable** - Similar to Readable.from but created transform is typed
-
-### Transformer Async
-Want to use async functions?
-NO PROBLEM!!!
-Access the async counterparts via transformer.async.
-Supported async functions: **callOnData, filter, fork, fromFunction, fromIterable**
-
-Async only functions: **fromFunctionConcurrent, fromFunctionConcurrent2**
-fromFunctionConcurrent2 is currently recommended
-  
-### Transformer Options
-
-- **shouldPushErrorsForward** - On error, should it be pushed to the next streams or not. Works together with plumber and errorStream
-
-- **chunkFormatter** - On error, format the chunk before attaching to the error object. 
-
-- **ignoreErrors** - Should errors be entirely ignored or not
-
-### Streams pipe (depracated)
-
-Pipe those typed transforms in a type safe(ish) way
-
-
-
-### Plumber
-
-Make complex pipes easier, and handle passing errors to error streams.
-Pipe transforms
-one -> one (like regular piping),
-one -> many,
-many -> one,
-many -> many.
-If an error stream is passed, pipe all transforms while passing errors to the error stream, and data to the next stream.
-
-  
-**many -> many pipe** - pipes arrays of equal size only, each transform of the source group is piped to a transform of the destination group with the same index. Basically it creates **several one -> one pipes**.
-
-**Warning** - the piping is complex, and in most cases simply calling unpipe will have undesired effects.
-
-**Unpiping is currently not supported**.
-
-If the stream should be unpiped in any point, try piping the source of the pipe connection to a passThrough without passing an error stream, then pipe that passThrough to the destination.
+```typescript
+import { transformer } from 'easier-streams';
 ```
 
-const source = transformer.fromIterable([1,2,3,4,5,6]);
-const passThroughForUnpiping = transformer.passThrough<number>();
-source.pipe(passThroughForUnpiping);
+All factory methods accept an optional `TransformOptions` object to override defaults.
 
-const manyPassThroughs = [1,2,3].map(() => transformer.passThrough<number>());
-const destination = transformer.passThrough<number>();
+---
 
-plumber.pipe({}, passThroughForUnpiping, manyPassThroughs, destination); 
+### Sync transforms
 
-//sometime later
-source.unpipe(passThroughForUnpiping);
+#### `transformer.fromFunction`
 
+Transforms each chunk using a synchronous function.
+
+```typescript
+const add1 = transformer.fromFunction((n: number) => n + 1);
+
+Readable.from([1, 2, 3]).pipe(add1);
+for await (const elem of add1) {
+    console.log(elem); // 2, 3, 4
+}
 ```
 
-### Plumber Options
+#### `transformer.filter`
 
-- **errorStream** - the error streams to which push all the errors from all piped transforms. **Note that the transforms have to be created via transformer with shouldPushErrorsForward = true**
-- **usePipeline** - switches the piping method from .pipe() to pipeline(). **pipeline is not supported in all piping scenarios, a warning will be printed to console when defaulting to .pipe()**
+Passes chunks through only if the filter function returns `true`.
 
-**Note** - when using plumber, the default piping method is a modified .pipe(). When an uncaught error occurs, it will close all the following transforms that were piped with plumber. 
-This differs from the regular .pipe() - it will only close and emit error on the throwing stream
-The throwing transform (if created through easier-streams) will emit a SOURCE_ERROR event, indicating that the error originated from that transform
+```typescript
+const odds = transformer.filter((n: number) => n % 2 === 1);
 
-
-
-  
-
-And now, a demonstration:
-
+Readable.from([1, 2, 3]).pipe(odds);
+for await (const elem of odds) {
+    console.log(elem); // 1, 3
+}
 ```
+
+#### `transformer.typeFilter`
+
+Like `filter`, but accepts a type guard and narrows the output type.
+
+```typescript
+const isString = (x: unknown): x is string => typeof x === 'string';
+const stringsOnly = transformer.typeFilter(isString);
+
+Readable.from(['a', 1, 'b', 2]).pipe(stringsOnly);
+for await (const elem of stringsOnly) {
+    console.log(elem); // 'a', 'b'
+}
+```
+
+#### `transformer.fork`
+
+Splits a stream into two based on a filter. Returns `{ filterTrueTransform, filterFalseTransform }`. Pipe the source into both outputs.
+
+```typescript
+const fork = transformer.fork((n: number) => n % 2 === 1);
+
+Readable.from([1, 2, 3]).pipe(fork.filterTrueTransform);
+Readable.from([1, 2, 3]).pipe(fork.filterFalseTransform);
+
+fork.filterTrueTransform.on('data', (n) => console.log('odd:', n));  // 1, 3
+fork.filterFalseTransform.on('data', (n) => console.log('even:', n)); // 2
+```
+
+#### `transformer.callOnData`
+
+Runs a side-effect function on each chunk (on a deep clone) without modifying the stream output.
+
+```typescript
+const logger = transformer.callOnData((n: number) => console.log('seeing:', n));
+
+Readable.from([1, 2, 3]).pipe(logger);
+for await (const elem of logger) {
+    console.log(elem); // 1, 2, 3 (unchanged)
+}
+```
+
+#### `transformer.arrayJoin`
+
+Collects chunks into arrays of a given length.
+
+```typescript
+const joiner = transformer.arrayJoin<number>(2);
+
+Readable.from([1, 2, 3, 4, 5]).pipe(joiner);
+for await (const elem of joiner) {
+    console.log(elem); // [1, 2], [3, 4], [5]
+}
+```
+
+#### `transformer.arraySplit`
+
+Splits array chunks into individual elements.
+
+```typescript
+const splitter = transformer.arraySplit<number>();
+
+Readable.from([[1, 2], [3, 4]]).pipe(splitter);
+for await (const elem of splitter) {
+    console.log(elem); // 1, 2, 3, 4
+}
+```
+
+#### `transformer.pickElementFromArray`
+
+Picks a single element by index from array chunks.
+
+```typescript
+const pickFirst = transformer.pickElementFromArray<number>(0);
+
+Readable.from([[1, 2, 3], [4, 5, 6], [7]]).pipe(pickFirst);
+for await (const elem of pickFirst) {
+    console.log(elem); // 1, 4, 7
+}
+```
+
+#### `transformer.counter`
+
+Counts passing chunks. Accepts an optional filter to count only matching chunks.
+
+```typescript
+const { transform, getCounter } = transformer.counter((n: number) => n % 2 === 0);
+
+Readable.from([1, 2, 3, 4]).pipe(transform);
+for await (const _ of transform) {}
+console.log(getCounter()); // 2
+```
+
+#### `transformer.passThrough`
+
+A typed pass-through that forwards chunks unchanged.
+
+```typescript
+const pt = transformer.passThrough<number>();
+```
+
+#### `transformer.void`
+
+Consumes all incoming chunks and emits nothing.
+
+```typescript
+const sink = transformer.void<number>();
+```
+
+#### `transformer.fromIterable`
+
+Creates a readable transform from a synchronous iterable (like `Readable.from`, but typed).
+
+```typescript
+const source = transformer.fromIterable([1, 2, 3]);
+for await (const elem of source) {
+    console.log(elem); // 1, 2, 3
+}
+```
+
+---
+
+### Async transforms
+
+Access async variants via `transformer.async`. These accept `async` functions.
+
+#### `transformer.async.fromFunction`
+
+```typescript
+const double = transformer.async.fromFunction(async (n: number) => n * 2);
+```
+
+#### `transformer.async.fromFunctionConcurrent`
+
+Runs the async transform function with a configurable concurrency limit.
+
+```typescript
+const concurrent = transformer.async.fromFunctionConcurrent(
+    async (n: number) => fetchSomething(n),
+    5, // max 5 concurrent
+);
+```
+
+#### `transformer.async.filter`
+
+```typescript
+const filtered = transformer.async.filter(async (n: number) => isValid(n));
+```
+
+#### `transformer.async.fork`
+
+```typescript
+const fork = transformer.async.fork(async (n: number) => n % 2 === 1);
+```
+
+#### `transformer.async.callOnData`
+
+```typescript
+const logger = transformer.async.callOnData(async (n: number) => {
+    await logToDb(n);
+});
+```
+
+#### `transformer.async.counter`
+
+```typescript
+const { transform, getCounter } = transformer.async.counter(async (n: number) => isEven(n));
+```
+
+#### `transformer.async.fromIterable`
+
+```typescript
+const source = transformer.async.fromIterable(asyncGenerator());
+```
+
+---
+
+### Base classes
+
+For full control, extend or instantiate the base classes directly:
+
+#### `SimpleTransform`
+
+Wraps a synchronous transform function.
+
+```typescript
+import { SimpleTransform } from 'easier-streams';
+
+const numberToString = new SimpleTransform((n: number) => n.toString(), { objectMode: true });
+```
+
+#### `SimpleAsyncTransform`
+
+Wraps an async transform function.
+
+```typescript
+import { SimpleAsyncTransform } from 'easier-streams';
+
+const asyncDouble = new SimpleAsyncTransform(async (n: number) => n * 2, { objectMode: true });
+```
+
+#### `BaseTransform`
+
+Base class for custom transforms. Extends Node.js `Transform` and adds:
+- `promisifyEvents(resolveEvents, rejectEvents)` — waits for stream events as a promise
+- `pipeline(transform)` — pipes using `stream.pipeline` and returns the destination
+- `pipelineMany(transforms)` — pipes to multiple destinations
+
+```typescript
+import { BaseTransform } from 'easier-streams';
+
+class MyTransform extends BaseTransform<number, string> {
+    _transform(chunk: number, _enc: BufferEncoding, callback: Function) {
+        callback(null, String(chunk));
+    }
+}
+```
+
+---
+
+### Chaining example
+
+```typescript
+import { Readable } from 'stream';
+import { transformer, SimpleTransform } from 'easier-streams';
 
 const source = transformer.fromIterable([1, 2, 3, 4, 5, 6, 7, 8]);
-const errorStream = transformer.errorTransform<number>();
-const add1 = async (n: number) => n + 1;
-const create3ElementsFrom1 = (n: number) => [n + 1, n + 2, n + 3];
-const errorOnNumber4 = (n: number) => {
-	if (n === 4) {
-		throw Error('Number is 4');
-	}
-	return n;
-}
 
-const filterOutOdds = (n: number) => !(n % 2);
-const numberToString = (n: number) => n.toString();
+const add1 = transformer.async.fromFunction(async (n: number) => n + 1);
+const expand = transformer.fromFunction((n: number) => [n, n + 1, n + 2]);
+const pickFirst = transformer.pickElementFromArray<number>(0);
+const filterEvens = transformer.filter((n: number) => n % 2 === 0);
+const toString = new SimpleTransform((n: number) => n.toString(), { objectMode: true });
 
-const add1Transform = transformer.async.fromFunction(add1);
-const create3ElementsFrom1Transform = transformer.fromFunction(create3ElementsFrom1);
-const takeOnlyFirstElementOfArrayTransform = transformer.pickElementFromArray(0);
-const errorOnNumber4Transform = transformer.fromFunction(errorOnNumber4, { errorStream });
-const filterOutOddsTranform = transformer.filter(filterOutOdds);
-const numberToStringTrasnform = new SimpleTransform(numberToString, { objectMode: true });
-
-plumber.pipe(
-	{errorStream},
-	source,
-	add1Transform,
-	create3ElementsFrom1Transform,
-	takeOnlyFirstElementOfArrayTransform,
-	errorOnNumber4Transform,
-	filterOutOddsTranform,
-	numberToStringTrasnform
-);
+source
+    .pipeline(add1)
+    .pipeline(expand)
+    .pipeline(pickFirst)
+    .pipeline(filterEvens)
+    .pipeline(toString);
 
 const result: string[] = [];
-const errorResults: StreamError<number>[] = [];
+toString.on('data', (s: string) => result.push(s));
+await toString.promisifyEvents('end', 'error');
 
-numberToStringTrasnform.on('data', (data: string) => result.push(data));
-errorStream.on('data', (error) => errorResults.push(error))
-
-await numberToStringTrasnform.promisifyEvents('end');
-
-console.log(result);// ['6','8','10']
-console.log(errorResults);// StreamError {error: Error('Number is 4'), data: 4}
-console.log('done');
-
+console.log(result); // ['2', '4', '6', '8', '10']
 ```

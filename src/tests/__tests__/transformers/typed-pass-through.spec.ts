@@ -1,6 +1,5 @@
 import { Readable } from 'stream';
 import { transformer } from '../../../streams/transformer';
-import { streamToArray } from '../../../helpers/test-helper';
 import { range } from '../../../helpers/helper-functions';
 
 describe('typedPassThrough', () => {
@@ -9,7 +8,7 @@ describe('typedPassThrough', () => {
         const source = Readable.from(arr);
         const typedPassThroughTransform = source.pipe(transformer.passThrough<number>());
 
-        const result = await streamToArray(typedPassThroughTransform);
+        const result = await typedPassThroughTransform.toArray();
         expect(result).toEqual(arr);
     });
 });

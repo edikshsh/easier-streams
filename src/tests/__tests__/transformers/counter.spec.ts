@@ -1,7 +1,7 @@
 import { Readable } from 'stream';
 import { transformer } from '../../../streams/transformer';
 import { range } from '../../../helpers/helper-functions';
-import { filterOutOddsAsync, filterOutOddsSync, streamToArray } from '../../../helpers/test-helper';
+import { filterOutOddsAsync, filterOutOddsSync } from '../../../helpers/test-helper';
 
 describe('counter', () => {
     describe('sync', () => {
@@ -12,7 +12,7 @@ describe('counter', () => {
             const { transform: counterTransform } = transformer.counter();
             source.pipe(counterTransform);
 
-            const result = await streamToArray(counterTransform);
+            const result = await counterTransform.toArray();
 
             expect(result).toEqual(arr);
         });
@@ -22,7 +22,7 @@ describe('counter', () => {
             const { transform: counterTransform, getCounter } = transformer.counter();
             readable.pipe(counterTransform);
 
-            await streamToArray(counterTransform);
+            await counterTransform.toArray();
             expect(getCounter()).toEqual(8);
         });
 
@@ -31,7 +31,7 @@ describe('counter', () => {
             const { transform: counterTransform, getCounter } = transformer.counter(filterOutOddsSync);
             source.pipe(counterTransform);
 
-            await streamToArray(counterTransform);
+            await counterTransform.toArray();
             expect(getCounter()).toEqual(4);
         });
 
@@ -41,7 +41,7 @@ describe('counter', () => {
             const { transform: counterTransform } = transformer.counter(filterOutOddsSync);
             source.pipe(counterTransform);
 
-            const result = await streamToArray(counterTransform);
+            const result = await counterTransform.toArray();
 
             expect(result).toEqual(arr);
         });
@@ -53,7 +53,7 @@ describe('counter', () => {
             const { transform: counterTransform, getCounter } = transformer.async.counter(filterOutOddsAsync(10));
             source.pipe(counterTransform);
 
-            await streamToArray(counterTransform);
+            await counterTransform.toArray();
             expect(getCounter()).toEqual(4);
         });
 
@@ -63,7 +63,7 @@ describe('counter', () => {
             const { transform: counterTransform } = transformer.async.counter(filterOutOddsAsync(10));
             source.pipe(counterTransform);
 
-            const result = await streamToArray(counterTransform);
+            const result = await counterTransform.toArray();
 
             expect(result).toEqual(arr);
         });

@@ -1,6 +1,4 @@
 import { TransformOptions } from 'stream';
-import { FullTransformOptions } from './transforms/types/full-transform-options.type';
-import { ErrorTransform } from './errors/error-transform';
 import { AsyncTransformFunction } from './transforms/base/simple-async-transform';
 import { TransformFunction } from './transforms/base/simple-transform';
 import { arraySplitTransform } from './transforms/utility/array-split-transform';
@@ -8,16 +6,13 @@ import { callOnDataSyncTransform, callOnDataAsyncTransform } from './transforms/
 import { voidInputTransform } from './transforms/utility/void-input-transform';
 import { asyncFilterTransform, FilterOptions, filterTransform } from './transforms/utility/filter-transforms';
 import { fromAsyncFunctionTransform, fromFunctionTransform } from './transforms/utility/from-function-transforms';
-import {
-    fromFunctionConcurrentTransform,
-    fromFunctionConcurrentTransform2,
-} from './transforms/utility/from-function-concurrent-transform';
+import { fromFunctionConcurrentTransform } from './transforms/utility/from-function-concurrent-transform';
+import { AsyncForkTransform, ForkTransform } from './transforms/utility/fork-transform';
 import { fromIterable } from './transforms/utility/from-iterable-transform';
 import { TypedPassThrough } from './transforms/utility/typed-pass-through';
 import { pickElementFromArrayTransform } from './transforms/utility/pick-element-from-array-transform';
 import { arrayJoinTransform } from './transforms/utility/array-join-transform';
 import { typeFilterTransform } from './transforms/utility/type-filter-transforms';
-import { PlumberOptions } from './utility/plumber-options.type';
 import { asyncCounterTransform, counterTransform } from './transforms/utility/counter-transform';
 import { AsyncFilterFunction, FilterFunction } from './transforms/types/filter-function.type';
 
@@ -26,11 +21,6 @@ export class TransformerBase {
 
     protected mergeOptions<T>(options?: T) {
         return Object.assign({}, this.defaultTrasformOptions, options);
-    }
-
-    errorTransform<T>(options?: TransformOptions) {
-        const finalOptions = this.mergeOptions(options);
-        return new ErrorTransform<T>(finalOptions);
     }
 }
 
@@ -56,7 +46,7 @@ export class Transformer extends TransformerBase {
      *     console.log(elem); // [1, 2], [3]
      * }
      */
-    arrayJoin<TSource>(length: number, options?: FullTransformOptions<TSource>) {
+    arrayJoin<TSource>(length: number, options?: TransformOptions) {
         const finalOptions = super.mergeOptions(options);
         return arrayJoinTransform<TSource>(length, finalOptions);
     }
@@ -78,7 +68,7 @@ export class Transformer extends TransformerBase {
      *     console.log(elem); // 1, 2, 3, 4, 5
      * }
      */
-    arraySplit<TSource>(options?: FullTransformOptions<TSource[]>) {
+    arraySplit<TSource>(options?: TransformOptions) {
         const finalOptions = this.mergeOptions(options);
         return arraySplitTransform<TSource[]>(finalOptions);
     }
@@ -101,7 +91,7 @@ export class Transformer extends TransformerBase {
      *     console.log(elem.a); // 1, 2, 3
      * }
      */
-    callOnData<TSource>(functionToCallOnData: (data: TSource) => void, options?: FullTransformOptions<TSource>) {
+    callOnData<TSource>(functionToCallOnData: (data: TSource) => void, options?: TransformOptions) {
         const finalOptions = this.mergeOptions(options);
         return callOnDataSyncTransform<TSource>(functionToCallOnData, finalOptions);
     }
@@ -119,7 +109,7 @@ export class Transformer extends TransformerBase {
      *     console.log(elem); // no output
      * }
      */
-    void<TSource>(options?: FullTransformOptions<TSource>) {
+    void<TSource>(options?: TransformOptions) {
         const finalOptions = this.mergeOptions(options);
         return voidInputTransform<TSource>(finalOptions);
     }
@@ -136,7 +126,7 @@ export class Transformer extends TransformerBase {
      *     console.log(elem); // 1, 2, 3
      * }
      */
-    passThrough<T>(options?: FullTransformOptions<T>) {
+    passThrough<T>(options?: TransformOptions) {
         const finalOptions = this.mergeOptions(options);
         return new TypedPassThrough<T>(finalOptions);
     }
@@ -154,7 +144,7 @@ export class Transformer extends TransformerBase {
      *     console.log(elem); // 1, 3
      * }
      */
-    filter<TSource>(filterFunction: FilterFunction<TSource>, options?: FullTransformOptions<TSource> & FilterOptions) {
+    filter<TSource>(filterFunction: FilterFunction<TSource>, options?: TransformOptions & FilterOptions) {
         const finalOptions = this.mergeOptions(options);
         return filterTransform<TSource>(filterFunction, finalOptions);
     }
@@ -175,7 +165,7 @@ export class Transformer extends TransformerBase {
      * console.log(getCounter()); // 1
      *
      */
-    counter<TSource>(countFilter?: FilterFunction<TSource>, options?: FullTransformOptions<TSource> & FilterOptions) {
+    counter<TSource>(countFilter?: FilterFunction<TSource>, options?: TransformOptions & FilterOptions) {
         const finalOptions = this.mergeOptions(options);
         return counterTransform(countFilter, finalOptions);
     }
@@ -198,15 +188,9 @@ export class Transformer extends TransformerBase {
      * await Promise.all([streamEnd(fork.filterTrueTransform), streamEnd(fork.filterFalseTransform)]);
      * // true: 1, false: 2, true: 3
      */
-    fork<TSource>(filterFunction: (chunk: TSource) => boolean, options?: FullTransformOptions<TSource>) {
+    fork<TSource>(filterFunction: (chunk: TSource) => boolean, options?: TransformOptions) {
         const finalOptions = this.mergeOptions(options);
-        const filterTrueTransform = filterTransform<TSource>(filterFunction, finalOptions);
-        const filterFalseTransform = filterTransform<TSource>((chunk: TSource) => !filterFunction(chunk), finalOptions);
-
-        return {
-            filterTrueTransform,
-            filterFalseTransform,
-        };
+        return new ForkTransform(filterFunction, finalOptions);
     }
 
     /**
@@ -227,7 +211,7 @@ export class Transformer extends TransformerBase {
      */
     typeFilter<TSource, TDestination extends TSource>(
         typeGuardFunction: (chunk: TSource) => chunk is TDestination,
-        options?: FullTransformOptions<TSource>,
+        options?: TransformOptions,
     ) {
         const finalOptions = this.mergeOptions(options);
         return typeFilterTransform(typeGuardFunction, finalOptions);
@@ -249,7 +233,7 @@ export class Transformer extends TransformerBase {
      */
     fromFunction<TSource, TDestination>(
         transformer: TransformFunction<TSource, TDestination | undefined>,
-        options?: FullTransformOptions<TSource>,
+        options?: TransformOptions,
     ) {
         const finalOptions = this.mergeOptions(options);
         return fromFunctionTransform<TSource, TDestination>(transformer, finalOptions);
@@ -269,7 +253,7 @@ export class Transformer extends TransformerBase {
      *     console.log(elem); // 3, 6
      * }
      */
-    pickElementFromArray<T>(index: number, options?: FullTransformOptions<T[]>) {
+    pickElementFromArray<T>(index: number, options?: TransformOptions) {
         const finalOptions = this.mergeOptions(options);
         return pickElementFromArrayTransform(index, finalOptions);
     }
@@ -312,7 +296,7 @@ export class AsyncTransformer extends TransformerBase {
      */
     callOnData<TSource>(
         functionToCallOnData: (data: TSource) => Promise<void>,
-        options?: FullTransformOptions<TSource>,
+        options?: TransformOptions,
     ) {
         const finalOptions = this.mergeOptions(options);
         return callOnDataAsyncTransform<TSource>(functionToCallOnData, finalOptions);
@@ -333,7 +317,7 @@ export class AsyncTransformer extends TransformerBase {
      */
     filter<TSource>(
         filterFunction: AsyncFilterFunction<TSource>,
-        options?: FullTransformOptions<TSource> & FilterOptions,
+        options?: TransformOptions & FilterOptions,
     ) {
         const finalOptions = this.mergeOptions(options);
         return asyncFilterTransform<TSource>(filterFunction, finalOptions);
@@ -357,7 +341,7 @@ export class AsyncTransformer extends TransformerBase {
      */
     counter<TSource>(
         countFilter: AsyncFilterFunction<TSource>,
-        options?: FullTransformOptions<TSource> & FilterOptions,
+        options?: TransformOptions & FilterOptions,
     ) {
         const finalOptions = this.mergeOptions(options);
         return asyncCounterTransform(countFilter, finalOptions);
@@ -381,18 +365,9 @@ export class AsyncTransformer extends TransformerBase {
      * await Promise.all([streamEnd(fork.filterTrueTransform), streamEnd(fork.filterFalseTransform)]);
      * // true: 1, false: 2, true: 3
      */
-    fork<TSource>(filterFunction: (chunk: TSource) => Promise<boolean>, options?: FullTransformOptions<TSource>) {
+    fork<TSource>(filterFunction: (chunk: TSource) => Promise<boolean>, options?: TransformOptions) {
         const finalOptions = this.mergeOptions(options);
-        const filterTrueTransform = asyncFilterTransform<TSource>(filterFunction, finalOptions);
-        const filterFalseTransform = asyncFilterTransform<TSource>(
-            async (chunk: TSource) => !(await filterFunction(chunk)),
-            finalOptions,
-        );
-
-        return {
-            filterTrueTransform,
-            filterFalseTransform,
-        };
+        return new AsyncForkTransform(filterFunction, finalOptions);
     }
 
     /**
@@ -411,38 +386,10 @@ export class AsyncTransformer extends TransformerBase {
      */
     fromFunction<TSource, TDestination>(
         transformer: AsyncTransformFunction<TSource, TDestination | undefined>,
-        options?: FullTransformOptions<TSource>,
+        options?: TransformOptions,
     ) {
         const finalOptions = this.mergeOptions(options);
         return fromAsyncFunctionTransform<TSource, TDestination>(transformer, finalOptions);
-    }
-
-    /**
-     *
-     * @deprecated please use fromFunctionConcurrent2
-     * @param transformer - async function that changes the chunk it gets
-     * @param concurrency - number of concurrent running transformer functions
-     * @param options
-     * @param plumberOptions - options for piping inner transforms
-     * @returns a input and output transform
-     * @example
-     * const source = Readable.from([1, 2, 3]);
-     * const { input, output } = transformer.async.fromFunctionConcurrent(async (n: number) => n + 1, 2);
-     *
-     * source.pipe(input);
-     *
-     * for await (const elem of output) {
-     *    console.log(elem); // 2, 3, 4
-     * }
-     */
-    fromFunctionConcurrent<TSource, TDestination>(
-        transformer: AsyncTransformFunction<TSource, TDestination | undefined>,
-        concurrency: number,
-        options?: FullTransformOptions<any>,
-        plumberOptions?: PlumberOptions<any>,
-    ) {
-        const finalOptions = this.mergeOptions(options);
-        return fromFunctionConcurrentTransform(transformer, concurrency, finalOptions, plumberOptions);
     }
 
     /**
@@ -461,13 +408,13 @@ export class AsyncTransformer extends TransformerBase {
      *    console.log(elem); // 2, 3, 4
      * }
      */
-    fromFunctionConcurrent2<TSource, TDestination>(
+    fromFunctionConcurrent<TSource, TDestination>(
         transformer: AsyncTransformFunction<TSource, TDestination | undefined>,
         concurrency: number,
-        options?: FullTransformOptions<any>,
+        options?: TransformOptions,
     ) {
         const finalOptions = this.mergeOptions(options);
-        return fromFunctionConcurrentTransform2(transformer, concurrency, finalOptions);
+        return fromFunctionConcurrentTransform(transformer, concurrency, finalOptions);
     }
 
     /**

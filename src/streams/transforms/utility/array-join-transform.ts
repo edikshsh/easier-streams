@@ -1,8 +1,7 @@
-import { TransformCallback } from 'stream';
+import { TransformCallback, TransformOptions } from 'stream';
 import { SimpleTransform, TransformFunction } from '../base/simple-transform';
-import { FullTransformOptions } from '../types/full-transform-options.type';
 
-export function arrayJoinTransform<TSource>(length: number, options?: FullTransformOptions<TSource>) {
+export function arrayJoinTransform<TSource>(length: number, options?: TransformOptions) {
     let array: TSource[] = [];
     const transformer: TransformFunction<TSource, TSource[] | undefined> = (chunk) => {
         array.push(chunk);
@@ -10,11 +9,10 @@ export function arrayJoinTransform<TSource>(length: number, options?: FullTransf
             const tempArray = array;
             array = [];
             return tempArray;
-        } else {
-            return undefined;
         }
+        return undefined;
     };
-    const optionsWithFlush: FullTransformOptions<TSource> = {
+    const optionsWithFlush: TransformOptions = {
         ...options,
         flush: (callback: TransformCallback) => {
             callback(null, array.length ? array : undefined);

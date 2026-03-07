@@ -1,7 +1,7 @@
 import { Readable } from 'stream';
 import { transformer } from '../../../streams/transformer';
 import { range, sleep } from '../../../helpers/helper-functions';
-import { DEFAULT_ERROR_TEXT, streamToArray } from '../../../helpers/test-helper';
+import { DEFAULT_ERROR_TEXT } from '../../../helpers/test-helper';
 
 describe('callOnData', () => {
     const numberToObject = (n: number) => ({
@@ -21,7 +21,7 @@ describe('callOnData', () => {
             source.pipe(sideEffectsTransform);
 
             const modified: { a: number }[] = [];
-            const result = await streamToArray(sideEffectsTransform);
+            const result = await sideEffectsTransform.toArray();
 
             expect(result).toEqual(arr);
             expect(modified).toEqual(expectedModifiedArr);
@@ -58,7 +58,7 @@ describe('callOnData', () => {
             const sideEffectsTransform = transformer.async.callOnData(increaseBy10);
             source.pipe(sideEffectsTransform);
 
-            const result = await streamToArray(sideEffectsTransform);
+            const result = await sideEffectsTransform.toArray();
 
             expect(result).toEqual(arr);
             expect(modified).toEqual(expectedModifiedArr);
@@ -77,7 +77,7 @@ describe('callOnData', () => {
             const sideEffectsTransform = transformer.async.callOnData(increaseBy10);
             source.pipe(sideEffectsTransform);
 
-            const result = await streamToArray(sideEffectsTransform);
+            const result = await sideEffectsTransform.toArray();
 
             expect(result).toEqual(arr);
             expect(modified).toEqual(expectedModifiedArr);
@@ -93,7 +93,7 @@ describe('callOnData', () => {
             const sideEffectsTransform = transformer.async.callOnData(increaseBy10);
             source.pipe(sideEffectsTransform);
 
-            await expect(streamToArray(sideEffectsTransform)).rejects.toThrow(Error(DEFAULT_ERROR_TEXT));
+            await expect(sideEffectsTransform.toArray()).rejects.toThrow(Error(DEFAULT_ERROR_TEXT));
         });
     });
 });

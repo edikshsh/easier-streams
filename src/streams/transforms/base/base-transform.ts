@@ -1,7 +1,8 @@
-import { Transform, TransformOptions } from 'stream';
+import { Readable, Transform, TransformOptions, pipeline as streamPipeline } from 'node:stream';
 import { PromisifyEventReturnType } from '../../../emitters/Emitter';
 import { EventEmitterTypes } from '../../../emitters/event-emitter-types.interface';
 import { eventPromisifier } from '../../../emitters/eventPromisifier';
+import { noop } from '../../../helpers/helper-functions';
 import { TransformEvents } from '../typed-transform/transform-events.type';
 import { TypedTransform } from '../typed-transform/typed-transform.interface';
 
@@ -19,7 +20,7 @@ export class BaseTransform<TSource, TDestination>
 
     private keysToStringArray<Key extends keyof TransformEvents<TDestination>>(keys?: Key | Key[]) {
         if (this.isKeyArray(keys)) {
-            return keys?.map((event) => event.toString()) || [];
+            return keys.map((event) => event.toString());
         }
         return keys ? [keys.toString()] : [];
     }
@@ -80,6 +81,18 @@ export class BaseTransform<TSource, TDestination>
     ): this;
     once(eventName: string | symbol, listener: (...args: unknown[]) => void): this {
         return super.once(eventName, listener);
+    }
+
+    pipeline<TNext>(transform: BaseTransform<TDestination, TNext>): BaseTransform<TDestination, TNext> {
+        streamPipeline(this as Readable, transform, noop);
+        return transform;
+    }
+
+    pipelineMany<TNext>(transforms: BaseTransform<TDestination, TNext> | BaseTransform<TDestination, TNext>[]): void {
+        const steps = Array.isArray(transforms) ? transforms : [transforms];
+        for (const transform of steps) {
+            streamPipeline(this as Readable, transform, noop);
+        }
     }
 
     [Symbol.asyncIterator](): AsyncIterableIterator<TDestination> {
