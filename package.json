@@ -8,6 +8,7 @@
         "test": "jest ./src/tests",
         "copy-files": "copyfiles package.json README.md dist",
         "pack": "tsc && npm run copy-files && cd dist && npm pack && move easier-streams*.tgz ../",
+        "pack-src": "node scripts/pack-src.js",
         "publish": "cd dist && npm publish"
     },
     "author": "",
