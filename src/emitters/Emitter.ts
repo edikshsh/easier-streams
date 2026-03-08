@@ -1,6 +1,5 @@
 import { EventEmitter } from 'stream';
 import { eventPromisifier } from './eventPromisifier';
-import { IPromisifiableEvents } from './promisifiableEvents';
 import { IEvents } from './types';
 
 export type TupleToUnion<T extends unknown[]> = T[number];
@@ -11,14 +10,14 @@ export type PromisifyEventReturnType<Events extends IEvents, Key extends keyof E
     ? Promise<void>
     : Promise<TupleToUnion<Parameters<Events[Key]>>>;
 
-export class TypedEventEmitter<Events extends IEvents> extends EventEmitter implements IPromisifiableEvents {
+export class TypedEventEmitter<Events extends IEvents> extends EventEmitter {
     private isKeyArray<Key extends keyof Events>(keys?: Key | Key[]): keys is Key[] {
         return Array.isArray(keys);
     }
 
     private keysToStringArray<Key extends keyof Events>(keys?: Key | Key[]) {
         if (this.isKeyArray(keys)) {
-            return keys?.map((event) => event.toString()) || [];
+            return keys.map((event) => event.toString());
         }
         return keys ? [keys.toString()] : [];
     }

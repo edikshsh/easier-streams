@@ -6,21 +6,19 @@ class EventPromisifier {
         resolveEvents: string[] | string = [],
         rejectEvents: string[] | string = [],
     ): Promise<unknown> {
-        resolveEvents = typeof resolveEvents === 'string' ? [resolveEvents] : resolveEvents;
-        rejectEvents = typeof rejectEvents === 'string' ? [rejectEvents] : rejectEvents;
-        resolveEvents = resolveEvents.filter((event) => event);
-        rejectEvents = rejectEvents.filter((event) => event);
-        if (!(resolveEvents.length || rejectEvents.length)) {
+        const resolveEventsArr = (typeof resolveEvents === 'string' ? [resolveEvents] : resolveEvents).filter(Boolean);
+        const rejectEventsArr = (typeof rejectEvents === 'string' ? [rejectEvents] : rejectEvents).filter(Boolean);
+        if (!(resolveEventsArr.length || rejectEventsArr.length)) {
             return undefined;
         }
 
         return new Promise<unknown>((resolve, reject) => {
-            const allEvents = [...resolveEvents, ...rejectEvents];
+            const allEvents = [...resolveEventsArr, ...rejectEventsArr];
             const functionsToTurnOff: { func: (...args: unknown[]) => unknown; event: string }[] = [];
             const wrapper = (eventString: string) => {
                 const eventListenerFunction = (data: unknown) => {
                     functionsToTurnOff.forEach((item) => emitter.off(item.event, item.func));
-                    if (resolveEvents.includes(eventString)) {
+                    if (resolveEventsArr.includes(eventString)) {
                         resolve(data);
                     } else {
                         reject(data);

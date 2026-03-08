@@ -1,6 +1,6 @@
 {
     "name": "easier-streams",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "make it easier to work with streams",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -8,17 +8,14 @@
         "test": "jest ./src/tests",
         "copy-files": "copyfiles package.json README.md dist",
         "pack": "tsc && npm run copy-files && cd dist && npm pack && move easier-streams*.tgz ../",
+        "pack-src": "node scripts/pack-src.js",
         "publish": "cd dist && npm publish"
     },
     "author": "",
     "license": "ISC",
-    "dependencies": {
-        "lodash.clonedeep": "^4.5.0"
-    },
     "devDependencies": {
         "@types/jest": "^27.5.2",
-        "@types/lodash.clonedeep": "^4.5.7",
-        "@types/node": "^18.7.20",
+        "@types/node": "^20.19.35",
         "@types/uuid": "^8.3.4",
         "@typescript-eslint/parser": "^6.6.0",
         "copyfiles": "^2.4.1",

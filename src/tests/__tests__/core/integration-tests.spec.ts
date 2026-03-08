@@ -2,7 +2,7 @@ import { Readable } from 'stream';
 import { SimpleAsyncTransform } from '../../../streams/transforms/base/simple-async-transform';
 import { SimpleTransform } from '../../../streams/transforms/base/simple-transform';
 import { range, sleep } from '../../../helpers/helper-functions';
-import { add, numberToStringAsync, streamToArray } from '../../../helpers/test-helper';
+import { add, numberToStringAsync } from '../../../helpers/test-helper';
 
 describe('integration tests', () => {
     it('Able to mix different transforms in a single stream', async () => {
@@ -19,7 +19,7 @@ describe('integration tests', () => {
 
         source.pipe(add1Transform).pipe(filterOutOddsTransform).pipe(numberToStringTransform);
 
-        const result = await streamToArray(numberToStringTransform);
+        const result = await numberToStringTransform.toArray();
 
         expect(result).toEqual(['3', '5', '7', '9']);
     });

@@ -1,10 +1,10 @@
 import { Stream } from 'stream';
 
-export async function sleep(n: number) {
+export function sleep(n: number) {
     return new Promise((res) => setTimeout(res, n));
 }
 
-export async function streamEnd(stream: Stream) {
+export function streamEnd(stream: Stream) {
     return new Promise((res, rej) => {
         stream.on('close', res);
         stream.on('error', rej);
@@ -16,5 +16,5 @@ export function noop(...args: any[]) {
 }
 
 export function range(len: number, start = 0) {
-    return [...new Array(len)].map(() => start++);
+    return Array.from({ length: len }, (_, i) => start + i);
 }

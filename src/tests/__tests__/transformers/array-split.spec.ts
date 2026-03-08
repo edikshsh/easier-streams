@@ -1,7 +1,7 @@
 import { Readable } from 'stream';
 import { arraySplitTransform } from '../../../streams/transforms/utility/array-split-transform';
 import { range } from '../../../helpers/helper-functions';
-import { streamToArray } from '../../../helpers/test-helper';
+
 
 describe('ArraySplitTransform', () => {
     it('should split array correctly', async () => {
@@ -12,7 +12,7 @@ describe('ArraySplitTransform', () => {
         ]);
         const arraySplitter = source.pipe(arraySplitTransform<number[]>({ objectMode: true }));
 
-        const result = await streamToArray(arraySplitter);
+        const result = await arraySplitter.toArray();
 
         expect(result).toEqual(range(8, 1));
     });
