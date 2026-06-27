@@ -11,7 +11,7 @@ describe('fork', () => {
             const filteredValues: number[] = [];
             const source = transformer.fromIterable(range(8, 1));
             const fork = transformer.fork(filterOutOddsSync);
-            source.pipeline(fork);
+            source.pipeOne(fork);
 
             fork.filterTrueTransform.on('data', (evenNumber) => keptValues.push(evenNumber));
             fork.filterFalseTransform.on('data', (oddNumber) => filteredValues.push(oddNumber));
@@ -27,7 +27,7 @@ describe('fork', () => {
         it('filterFalseTransform is empty when all items match the filter', async () => {
             const source = transformer.fromIterable([2, 4, 6, 8]);
             const fork = transformer.fork(filterOutOddsSync); // keeps evens
-            source.pipeline(fork);
+            source.pipeOne(fork);
 
             const [trueResult, falseResult] = await Promise.all([
                 fork.filterTrueTransform.toArray(),
@@ -41,7 +41,7 @@ describe('fork', () => {
         it('filterTrueTransform is empty when no items match the filter', async () => {
             const source = transformer.fromIterable([1, 3, 5, 7]);
             const fork = transformer.fork(filterOutOddsSync); // keeps evens
-            source.pipeline(fork);
+            source.pipeOne(fork);
 
             const [trueResult, falseResult] = await Promise.all([
                 fork.filterTrueTransform.toArray(),
@@ -59,9 +59,9 @@ describe('fork', () => {
             expect(() => fork.pipe(new PassThrough())).toThrow(FORK_OUTPUT_ERROR);
         });
 
-        it('should throw when .pipeline() is called on the fork', () => {
+        it('should throw when .pipeOne() is called on the fork', () => {
             const fork = transformer.fork(filterOutOddsSync);
-            expect(() => (fork as any).pipeline(new PassThrough())).toThrow(FORK_OUTPUT_ERROR);
+            expect(() => fork.pipeOne(new PassThrough() as any)).toThrow(FORK_OUTPUT_ERROR);
         });
 
         it('should throw when used as a readable in Node pipeline()', () => {
@@ -77,7 +77,7 @@ describe('fork', () => {
             const source = transformer.fromIterable(range(8, 1));
             const filterOutOdds = async (n: number) => n % 2 === 0;
             const fork = transformer.async.fork(filterOutOdds);
-            source.pipeline(fork);
+            source.pipeOne(fork);
 
             const [keptValues, filteredValues] = await Promise.all([
                 fork.filterTrueTransform.toArray(),

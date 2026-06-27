@@ -301,8 +301,8 @@ const asyncDouble = new SimpleAsyncTransform(async (n: number) => n * 2, { objec
 
 Base class for custom transforms. Extends Node.js `Transform` and adds:
 - `promisifyEvents(resolveEvents, rejectEvents)` — waits for stream events as a promise
-- `pipeline(transform)` — pipes using `stream.pipeline` and returns the destination
-- `pipelineMany(transforms)` — pipes to multiple destinations
+- `pipeOne(transform)` — pipes using `stream.pipeline` and returns the destination
+- `pipeBroadcast(transforms)` — broadcasts to multiple destinations (each receives every chunk)
 
 ```typescript
 import { BaseTransform } from 'easier-streams';
@@ -331,11 +331,11 @@ const filterEvens = transformer.filter((n: number) => n % 2 === 0);
 const toString = new SimpleTransform((n: number) => n.toString(), { objectMode: true });
 
 source
-    .pipeline(add1)
-    .pipeline(expand)
-    .pipeline(pickFirst)
-    .pipeline(filterEvens)
-    .pipeline(toString);
+    .pipeOne(add1)
+    .pipeOne(expand)
+    .pipeOne(pickFirst)
+    .pipeOne(filterEvens)
+    .pipeOne(toString);
 
 const result: string[] = [];
 toString.on('data', (s: string) => result.push(s));
