@@ -83,12 +83,12 @@ export class BaseTransform<TSource, TDestination>
         return super.once(eventName, listener);
     }
 
-    pipeline<TNext>(transform: BaseTransform<TDestination, TNext>): BaseTransform<TDestination, TNext> {
+    pipeOne<TNext>(transform: BaseTransform<TDestination, TNext>): BaseTransform<TDestination, TNext> {
         streamPipeline(this as Readable, transform, noop);
         return transform;
     }
 
-    pipelineMany<TNext>(transforms: BaseTransform<TDestination, TNext> | BaseTransform<TDestination, TNext>[]): void {
+    pipeBroadcast<TNext>(transforms: BaseTransform<TDestination, TNext> | BaseTransform<TDestination, TNext>[]): void {
         const steps = Array.isArray(transforms) ? transforms : [transforms];
         for (const transform of steps) {
             streamPipeline(this as Readable, transform, noop);
@@ -97,5 +97,5 @@ export class BaseTransform<TSource, TDestination>
 
     [Symbol.asyncIterator](): NodeJS.AsyncIterator<TDestination> {
         return super[Symbol.asyncIterator]();
-    }   
-} 
+    }
+}

@@ -30,11 +30,11 @@ export class ForkTransform<TSource> extends BaseTransform<TSource, Tagged<TSourc
             (tagged) => (tagged.result ? undefined : tagged.data),
             options,
         );
-        this.pipelineMany([this.filterTrueTransform, this.filterFalseTransform]);
+        this.pipeBroadcast([this.filterTrueTransform, this.filterFalseTransform]);
 
         this.pipe = throwOnExternalPipe as unknown as typeof this.pipe;
-        this.pipeline = throwOnExternalPipe as unknown as typeof this.pipeline;
-        this.pipelineMany = throwOnExternalPipe as unknown as typeof this.pipelineMany;
+        this.pipeOne = throwOnExternalPipe as unknown as typeof this.pipeOne;
+        this.pipeBroadcast = throwOnExternalPipe as unknown as typeof this.pipeBroadcast;
     }
 
     _transform(chunk: TSource, _encoding: BufferEncoding, callback: TransformCallback) {
@@ -60,11 +60,11 @@ export class AsyncForkTransform<TSource> extends BaseTransform<TSource, Tagged<T
             (tagged) => (tagged.result ? undefined : tagged.data),
             options,
         );
-        this.pipelineMany([this.filterTrueTransform, this.filterFalseTransform]);
+        this.pipeBroadcast([this.filterTrueTransform, this.filterFalseTransform]);
 
         this.pipe = throwOnExternalPipe as unknown as typeof this.pipe;
-        this.pipeline = throwOnExternalPipe as unknown as typeof this.pipeline;
-        this.pipelineMany = throwOnExternalPipe as unknown as typeof this.pipelineMany;
+        this.pipeOne = throwOnExternalPipe as unknown as typeof this.pipeOne;
+        this.pipeBroadcast = throwOnExternalPipe as unknown as typeof this.pipeBroadcast;
     }
 
     async _transform(chunk: TSource, _encoding: BufferEncoding, callback: TransformCallback) {
