@@ -95,7 +95,7 @@ export class BaseTransform<TSource, TDestination>
         }
     }
 
-    [Symbol.asyncIterator](): AsyncIterableIterator<TDestination> {
+    [Symbol.asyncIterator](): NodeJS.AsyncIterator<TDestination> {
         return super[Symbol.asyncIterator]();
-    }
-}
+    }   
+} 

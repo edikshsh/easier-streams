@@ -76,7 +76,7 @@ describe('fromFunctionConcurrent', () => {
         const source = transformer.fromIterable(arr);
 
         const streamDonePromise = concurrentTransform.promisifyEvents('close', 'error');
-        pipeline(source as Transform, erroringTransform, concurrentTransform).catch(noop);
+        pipeline(source as Transform, erroringTransform as Transform, concurrentTransform).catch(noop);
         await expect(streamDonePromise).rejects.toThrow(DEFAULT_ERROR_TEXT);
     });
 
@@ -91,7 +91,7 @@ describe('fromFunctionConcurrent', () => {
         const source = transformer.fromIterable(arr);
 
         const p = passThrough.promisifyEvents('close', 'error');
-        pipeline(source as Transform, concurrentTransform, erroringTransform, passThrough).catch(noop);
+        pipeline(source as Transform, concurrentTransform as Transform, erroringTransform as Transform, passThrough).catch(noop);
         await expect(p).rejects.toThrow(DEFAULT_ERROR_TEXT);
     });
 
@@ -109,7 +109,7 @@ describe('fromFunctionConcurrent', () => {
         const source = transformer.fromIterable(arr);
 
         const p = passThrough.promisifyEvents('close', 'error');
-        pipeline(source as Transform, concurrentTransform, passThrough).catch(noop);
+        pipeline(source as Transform, concurrentTransform as Transform, passThrough).catch(noop);
         await expect(p).rejects.toThrow(DEFAULT_ERROR_TEXT);
     });
 

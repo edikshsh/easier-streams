@@ -7,8 +7,9 @@
         "stripInternal": true,
         "sourceMap": true,
         "resolveJsonModule": true,
+        "types": ["node"],
         "lib": [
-            "es6",
+            "esnext",
             "dom"
         ],
         "strict": true,

@@ -17,5 +17,5 @@ export interface EventEmitterTypes<Events extends IEvents> {
 
     removeListener<Key extends keyof Events>(eventName: Key, listener: Events[Key]): this;
 
-    once<Key extends keyof Events>(eventName: Key, listener: Events[Key]): this;
+    once<Key extends keyof Events>(eventName: Key, listener: Events[Key]): this;  
 }
